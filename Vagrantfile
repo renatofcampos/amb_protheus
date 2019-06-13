@@ -285,6 +285,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	protheus.vm.network "private_network", ip: "192.168.56.20"
     protheus.vm.provision "shell", inline: $script_install_protheus
 	protheus.vm.provision "shell", inline: $script_protheus_start
+	protheus.vm.synced_folder "./pasta_sincronizada", "/protheus/protheus_data/pasta_sincronizada"
   end
 
   config.vm.define "protheus_rest" do |protheus_rest|
@@ -294,6 +295,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     protheus_rest.vm.provision "shell", inline: $script_install_protheus
 	protheus_rest.vm.provision "shell", inline: $script_protheus_rest_start
+	protheus_rest.vm.synced_folder "./pasta_sincronizada", "/protheus/protheus_data/pasta_sincronizada"
   end
 end
 
