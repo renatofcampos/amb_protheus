@@ -155,11 +155,11 @@ $script_install_lockserver = <<-SCRIPT
 SCRIPT
 
 $script_lockserver_start = <<-SCRIPT
-	sudo cp /synced_folder/manifests/init-lockserver.sh /usr/local/bin/init-lockserver.sh && \
+	sudo cp /install/manifests/init-lockserver.sh /usr/local/bin/init-lockserver.sh && \
 	sudo sed -i -e 's/\r$//' /usr/local/bin/init-lockserver.sh && \
 	sudo chmod +x /usr/local/bin/* /usr/bin/* && \
 	sudo echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin &&\
-	sudo cp /synced_folder/manifests/init-lockserver.service /etc/systemd/init-lockserver.service && \
+	sudo cp /install/manifests/init-lockserver.service /etc/systemd/init-lockserver.service && \
 	sudo sed -i -e 's/\r$//' /etc/systemd/init-lockserver.service && \
     sudo chmod 664 /etc/systemd/init-lockserver.service && \
 	sudo systemctl daemon-reload && \
@@ -168,11 +168,11 @@ $script_lockserver_start = <<-SCRIPT
 SCRIPT
 
 $script_protheus_start = <<-SCRIPT
-	sudo cp /synced_folder/manifests/init-protheus.sh /usr/local/bin/init-protheus.sh && \
+	sudo cp /install/manifests/init-protheus.sh /usr/local/bin/init-protheus.sh && \
 	sudo sed -i -e 's/\r$//' /usr/local/bin/init-protheus.sh && \
 	sudo chmod +x /usr/local/bin/* /usr/bin/* && \
 	sudo echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin &&\
-	sudo cp /synced_folder/manifests/init-protheus.service /etc/systemd/init-protheus.service && \
+	sudo cp /install/manifests/init-protheus.service /etc/systemd/init-protheus.service && \
 	sudo sed -i -e 's/\r$//' /etc/systemd/init-protheus.service && \
     sudo chmod 664 /etc/systemd/init-protheus.service && \
 	sudo systemctl daemon-reload && \
@@ -181,7 +181,7 @@ $script_protheus_start = <<-SCRIPT
 SCRIPT
 
 $script_protheus_rest_start = <<-SCRIPT
-	sudo cp /synced_folder/manifests/init-protheus-rest.sh /usr/local/bin/init-protheus-rest.sh && \
+	sudo cp /install/manifests/init-protheus-rest.sh /usr/local/bin/init-protheus-rest.sh && \
 	sudo sed -i -e 's/\r$//' /usr/local/bin/init-protheus-rest.sh && \
 	sudo chmod +x /usr/local/bin/* /usr/bin/* && \
 	sudo echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin
@@ -192,22 +192,17 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "bento/centos-7.2"
-  # config.vbguest.auto_update = false
   config.ssh.insert_key = false
-  # config.ssh.private_key_path = ["~/.ssh/id_rsa", "~/.vagrant.d/insecure_private_key"]
-  # config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
+  config.vm.provision "file", source: "~/.ssh/autorization.pub", destination: "~/.ssh/authorized_keys"
+  config.ssh.private_key_path = ["~/.ssh/autorization", "~/.vagrant.d/insecure_private_key"]
   config.ssh.username = "vagrant"
   config.ssh.password = "vagrant"
 
-  # habilita a interface grafica no virtualbox
-  # config.vm.provider "virtualbox" do |vb|
-  #    vb.gui = true
-  # end
-  
   config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.synced_folder "./configs", "/synced_folder"
+  config.vm.synced_folder "./configs", "/install"
+  config.vm.synced_folder "./logs", "/logs"
 
-  config.vm.provision "shell", inline: "cat /synced_folder/autorization.pub >> .ssh/authorized_keys"
+  config.vm.provision "shell", inline: "cat /install/autorization.pub >> .ssh/authorized_keys"
   config.vm.provision "shell", inline: $script_init
 
   # workaround the vagrant 1.8.5 bug
@@ -215,7 +210,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  
   # maquina postgres	  
   config.vm.define "postgres" do |postgres|
-	# postgres.vm.network "public_network", type: "dhcp"
 	postgres.vm.hostname = "dbaccess-svc"
     postgres.vm.network :private_network, ip: "192.168.56.100"
 	postgres.vm.network "forwarded_port", guest: 22, host: 2300
@@ -238,8 +232,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
  
   config.vm.define "oracle" do |oracle|
-    # oracle.vm.network "public_network", ip: "192.168.1.200"
-	# oracle.vm.network "public_network", type: "dhcp"
 	oracle.vm.hostname = "dbaccess-svc"
     oracle.vm.network :private_network, ip: "192.168.56.100"
 	oracle.vm.network "forwarded_port", guest: 22, host: 2300
@@ -257,36 +249,33 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		v_oracle.vm.network "forwarded_port", guest: 1521, host: 1521
 
 		# Provision everything on the first run
-		v_oracle.vm.provision "shell", path: "/synced_folder/scripts/oracle_install.sh"
-		v_oracle.vm.synced_folder "./oradata", "/synced_folder/oradata", owner: "oracle", group: "oinstall"
+		v_oracle.vm.provision "shell", path: "/install/scripts/oracle_install.sh"
+		v_oracle.vm.synced_folder "./oradata", "/install/oradata", owner: "oracle", group: "oinstall"
 	end
   end
 
   config.vm.define "lockserver" do |lockserver|
     lockserver.vm.provider "virtualbox" do |v_lockserver|
-      v_lockserver.memory = 1024
+      v_lockserver.memory = 512
       v_lockserver.cpus = 1
       v_lockserver.name = "protheus-lockserver-svc"
-      # v_lockserver.customize ["modifyvm", :id, "--nictype1", "virtio"] # makes the internet speed faster in Win10 host
     end
 
     lockserver.vm.network :private_network, ip: "192.168.56.10"
 	lockserver.vm.network "forwarded_port", guest: 22, host: 2210
 	lockserver.vm.hostname = "protheus-lockserver-svc"
-    # lockserver.vm.provision "shell", inline: $script_install_lockserver
+    lockserver.vm.provision "shell", inline: $script_install_lockserver
 	lockserver.vm.provision "shell", inline: $script_lockserver_start
+	lockserver.vm.synced_folder "./protheus_ini", "/configuracoes"
   end  
  
   config.vm.define "protheus" do |protheus|
     protheus.vm.provider "virtualbox" do |v_protheus|
-      v_protheus.memory = 768
-      v_protheus.cpus = 1
+      v_protheus.memory = 2048
+      v_protheus.cpus = 2
       v_protheus.name = "protheus-svc"
 	  v_protheus.customize ["modifyvm", :id, "--cableconnected1", "on"]
-	  # v_protheus.customize ["modifyvm", :id, "--ioapic", "on"]
-	  v_protheus.customize ["modifyvm", :id, "--cpuexecutioncap", "100"]
-	  # v_protheus.customize ["modifyvm", :id, "--nictype1", "virtio"] # makes the internet speed faster in Win10 host
-      # v_protheus.customize ["modifyvm", :id, "--nictype2", "virtio"]
+	  v_protheus.customize ["modifyvm", :id, "--cpuexecutioncap", "80"]
 	  v_protheus.customize ["modifyvm", :id, "--audio", "none"]
 	end
 
@@ -295,6 +284,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     protheus.vm.provision "shell", inline: $script_install_protheus
 	protheus.vm.provision "shell", inline: $script_protheus_start
 	protheus.vm.synced_folder "./pasta_sincronizada", "/protheus/protheus_data/pasta_sincronizada"
+	protheus.vm.synced_folder "./protheus_ini", "/configuracoes"
   end
 
   config.vm.define "protheus_rest" do |protheus_rest|
@@ -304,7 +294,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     protheus_rest.vm.provision "shell", inline: $script_install_protheus
 	protheus_rest.vm.provision "shell", inline: $script_protheus_rest_start
-	protheus_rest.vm.synced_folder "./pasta_sincronizada", "/protheus/protheus_data/pasta_sincronizada"
+	protheus_rest.vm.synced_folder "./protheus_ini", "/configuracoes"
+
   end
 end
 
