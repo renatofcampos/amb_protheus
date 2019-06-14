@@ -159,7 +159,12 @@ $script_lockserver_start = <<-SCRIPT
 	sudo sed -i -e 's/\r$//' /usr/local/bin/init-lockserver.sh && \
 	sudo chmod +x /usr/local/bin/* /usr/bin/* && \
 	sudo echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin &&\
-	sudo echo reboot
+	sudo cp /synced_folder/manifests/init-lockserver.service /etc/systemd/init-lockserver.service && \
+	sudo sed -i -e 's/\r$//' /etc/systemd/init-lockserver.service && \
+    sudo chmod 664 /etc/systemd/init-lockserver.service && \
+	sudo systemctl daemon-reload && \
+	sudo systemctl enable /etc/systemd/init-lockserver.service && \
+	sudo systemctl start init-lockserver.service
 SCRIPT
 
 $script_protheus_start = <<-SCRIPT
@@ -167,15 +172,19 @@ $script_protheus_start = <<-SCRIPT
 	sudo sed -i -e 's/\r$//' /usr/local/bin/init-protheus.sh && \
 	sudo chmod +x /usr/local/bin/* /usr/bin/* && \
 	sudo echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin &&\
-	sudo echo reboot
+	sudo cp /synced_folder/manifests/init-protheus.service /etc/systemd/init-protheus.service && \
+	sudo sed -i -e 's/\r$//' /etc/systemd/init-protheus.service && \
+    sudo chmod 664 /etc/systemd/init-protheus.service && \
+	sudo systemctl daemon-reload && \
+	sudo systemctl enable /etc/systemd/init-protheus.service && \
+	sudo systemctl start init-protheus.service
 SCRIPT
 
 $script_protheus_rest_start = <<-SCRIPT
 	sudo cp /synced_folder/manifests/init-protheus-rest.sh /usr/local/bin/init-protheus-rest.sh && \
 	sudo sed -i -e 's/\r$//' /usr/local/bin/init-protheus-rest.sh && \
 	sudo chmod +x /usr/local/bin/* /usr/bin/* && \
-	sudo echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin &&\
-	sudo echo reboot
+	sudo echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin
 SCRIPT
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
@@ -264,7 +273,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     lockserver.vm.network :private_network, ip: "192.168.56.10"
 	lockserver.vm.network "forwarded_port", guest: 22, host: 2210
 	lockserver.vm.hostname = "protheus-lockserver-svc"
-    lockserver.vm.provision "shell", inline: $script_install_lockserver
+    # lockserver.vm.provision "shell", inline: $script_install_lockserver
 	lockserver.vm.provision "shell", inline: $script_lockserver_start
   end  
  
