@@ -39,7 +39,7 @@ cls
 echo =====================================
 echo *   Ambiente Protheus + SQL Server  *
 echo =====================================
-cd c:\vagrant\amb_protheus\
+cd c:\ambientes\amb_protheus\
 vagrant up lockserver protheus
 cls
 echo ===========================================
@@ -54,7 +54,7 @@ cls
 echo =====================================
 echo *   Ambiente Protheus + PostgreSQL  *
 echo =====================================
-cd c:\vagrant\amb_protheus\
+cd c:\ambientes\amb_protheus\
 vagrant up lockserver protheus postgresql
 cls
 echo ===========================================
@@ -84,7 +84,7 @@ cls
 echo ==================================
 echo *    apagando todos ambientes    *
 echo ==================================
-cd c:\vagrant\amb_protheus\
+cd c:\ambientes\amb_protheus\
 vagrant destroy
 pause
 goto opcao6
@@ -129,7 +129,7 @@ cls
 echo =====================================
 echo *         PARANDO AMBIENTE          *
 echo =====================================
-cd c:\vagrant\amb_protheus\
+cd c:\ambientes\amb_protheus\
 vagrant halt
 cls
 echo ===========================================

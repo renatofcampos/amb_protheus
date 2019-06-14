@@ -39,7 +39,7 @@ Quando executamos o comando para o Vagrant subir uma VM, ele lê o arquivo ```Va
 ## 2 - Utilizando o ambiente
 
 #### 2.1 - Instalando ambientes em sua maquina
-1. Após instalado os arquivos necessários, realize o download do arquivo https://github.com/renatofcampos/amb_protheus/blob/master/install.bat 
+1. Após instalado os arquivos necessários, realize o download do arquivo https://github.com/renatofcampos/amb_protheus/blob/master/preparar_ambientes.bat 
 2. Execute o install.bat em modo de administrador
 	Este instalador irá realizar a criação das pastas dentro do seu disco C: com o nome amb_protheus e irá realizar o download de todos os componentes necessários para utilização dos ambientes.
 3. Após concluido o processo de instalação, verifique dentro da pasta c:\amb_protheus\atalhos que foram criados os atalhos para os ambientes protheus. 
