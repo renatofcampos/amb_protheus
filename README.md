@@ -42,13 +42,14 @@ Quando executamos o comando para o Vagrant subir uma VM, ele lê o arquivo ```Va
 1. Após instalado os arquivos necessários, realize o download do arquivo https://github.com/renatofcampos/amb_protheus/blob/master/preparar_ambientes.bat 
 2. Execute o install.bat em modo de administrador
 	Este instalador irá realizar a criação das pastas dentro do seu disco C: com o nome amb_protheus e irá realizar o download de todos os componentes necessários para utilização dos ambientes.
-3. Após concluido o processo de instalação, verifique dentro da pasta c:\amb_protheus\atalhos que foram criados os atalhos para os ambientes protheus. 
-    Cada atalho inicializa um ambiente conforme o seu banco de dados.
-	Até este momento, temos disponivel o ambiente Protheus com MSSQLSERVER e Protheus com PostgreSQL. Basta clicar no arquivo "start_nome do ambiente.bat" e aguardar o provisionamento do ambiente localmente.
+3. Após concluido o processo de instalação, verifique em sua área de trabalho se foi criado o atalho ambiente_protheus.bat. Se não foi criado, entre na pasta: C:\ambientes\amb_protheus\configs\ e copie o arquivo ambiente_protheus.bat para a area de trabalho.
+	Este arquivo ao ser executado irá exibir um menu de inicialização dos ambientes, neste momento somente temos disponiveis o ambiente Linux com SQLSERVER (deve-se apontar o ini para o seu dbaccess local) Até este momento, temos disponivel o ambiente Protheus com MSSQLSERVER e Protheus com PostgreSQL. Basta clicar no arquivo "start_nome do ambiente.bat" e aguardar o provisionamento do ambiente localmente.
 	O processo de provisionamento poderá demorar cerca de 10 minutos, pois todos os artefatos do protheus e do banco são realizados download do arte.totvs.com.br e das bibliotecas necessárias para o protheus executar.
 	Uma vez provisionado, a subida da maquina deve demorar 2 minutos em média. 
-	Para parar o ambiente, basta executar o arquivo de "stop_nome do ambiente.bat"
-	Para excluir todo ambiente para nova criação, basta executar o arquivo "destroy_nome do ambiente.bat"
+	Para parar o ambiente, basta escolher a opção para ambiente.
+	Para excluir todo ambiente para nova criação, basta executar a opção de apagar ambiente.
+4. Dentro da pasta C:\ambientes\amb_protheus tem uma pasta chamada pasta_sincronizada. Esta pasta te da acesso a uma pasta dentro do protheus_data do protheus. Caso queira copiar algum arquivo para dentro do ambiente e/ou extrair alguma informação, utilize esta pasta para realizar o processo desejado.
+5. Neste projeto não damos acesso as pastas de instalação do protheus e/ou do linux que ele está instalado, pois a ideia é montarmos um ambiente mais proximo de nossos clientes em sua maquina. Caso tenha conhecimento avançado em bash/linux, basta realizar um ssh no IP 127.0.0.1 ou digitar vagrant ssh protheus para ter acesso as pastas do sistema.
 
 
 
