@@ -193,13 +193,13 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "bento/centos-7.2"
   config.ssh.insert_key = false
-  config.vm.provision "file", source: "~/.ssh/autorization.pub", destination: "~/.ssh/authorized_keys"
-  config.ssh.private_key_path = ["~/.ssh/autorization", "~/.vagrant.d/insecure_private_key"]
+  #config.vm.provision "file", source: "~/.ssh/autorization.pub", destination: "~/.ssh/authorized_keys"
+  #config.ssh.private_key_path = ["~/.ssh/autorization", "~/.vagrant.d/insecure_private_key"]
   config.ssh.username = "vagrant"
   config.ssh.password = "vagrant"
 
   config.vm.synced_folder ".", "/vagrant", disabled: true
-  config.vm.synced_folder "./configs", "/install"
+  config.vm.synced_folder "./install", "/install"
   config.vm.synced_folder "./logs", "/logs"
 
   config.vm.provision "shell", inline: "cat /install/autorization.pub >> .ssh/authorized_keys"
