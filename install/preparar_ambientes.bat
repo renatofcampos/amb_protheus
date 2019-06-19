@@ -43,7 +43,8 @@ cd c:\ambientes\amb_protheus
 copy C:\ambientes\amb_protheus\configs\ambiente_protheus.bat %HOMEDRIVE%%HOMEPATH%\desktop\ambiente_protheus.bat
 
 echo Iniciando a instalação dos ambientes na maquina local
-vagrant up lockserver protheus
+vagrant plugin install vagrant-vbguest
+vagrant up postgres lockserver protheus
 vagrant halt
 cls
 echo  ============================================

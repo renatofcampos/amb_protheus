@@ -1,8 +1,0 @@
-[Unit]
-#After=
-
-[Service]
-ExecStart=/usr/local/bin/init-protheus.sh
-
-[Install]
-WantedBy=default.target

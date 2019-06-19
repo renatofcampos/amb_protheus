@@ -1,8 +1,0 @@
-[Unit]
-#After=
-
-[Service]
-ExecStart=/usr/local/bin/init-lockserver.sh
-
-[Install]
-WantedBy=default.target

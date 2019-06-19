@@ -1,199 +1,3 @@
-$script_init = <<-SCRIPT
-	sudo yum update -y && \
-
-	sudo yum install -y wget &&\
-	sudo yum install -y unzip &&\
-	sudo yum install -y tar &&\
-	sudo yum install -y telnet &&\
-	sudo yum install -y vim &&\
-	sudo yum install -y epel-release  && \
-	sudo yum install -y binutils.x86_64 compat-libcap1.x86_64 gcc.x86_64 gcc-c++.x86_64 glibc.i686 glibc.x86_64 glibc-devel.i686 glibc-devel.x86_64 ksh compat-libstdc++-33 libaio.i686 libaio.x86_64 libaio-devel.i686 libaio-devel.x86_64 libgcc.i686 libgcc.x86_64 libstdc++.i686 libstdc++.x86_64 libstdc++-devel.i686 libstdc++-devel.x86_64 libXi.i686 libXi.x86_64 libXtst.i686 libXtst.x86_64 make.x86_64 sysstat.x86_64 which && \
-	sudo yum install -y puppet-server &&\
-	sudo yum clean all     && \
-	sudo rm -rf /var/cache/yum    && \
-
-	sudo sed '/(soft nofile)/d' /etc/security/limits.conf    && \
-	sudo sed '/(hard nofile)/d' /etc/security/limits.conf    && \
-	sudo echo 'soft nofile 32768' >> /etc/security/limits.conf    && \
-	sudo echo 'hard nofile 32768' >> /etc/security/limits.conf    && \
-	sudo chsh -s /bin/bash vagrant
-SCRIPT
-
-$script_dbaccess = <<-SCRIPT
-	sudo mkdir -p /dbaccess && \
-	sudo mkdir -p /logs && \
-	sudo cd /totvs/dbaccess && \
-
-	sudo wget https://arte.engpro.totvs.com.br/tec/dbaccess/linux/64/published/dbaccess.tar.gz && \
-	sudo tar -xvzf dbaccess.tar.gz && \
-	sudo cp multi/dbaccess64 dbaccess64
-	sudo cp multi/dbaccess64.so dbaccess64.so
-
-	sudo cp /install/manifests/init-dbaccess.service /etc/systemd/init-dbaccess.service && \
-	sudo sed -i -e 's/\r$//' /etc/systemd/init-dbaccess.service && \
-    sudo chmod 664 /etc/systemd/init-dbaccess.service && \
-	sudo systemctl daemon-reload && \
-	sudo systemctl enable /etc/systemd/init-dbaccess.service && \
-	sudo systemctl start init-dbaccess.service
-SCRIPT
-
-$script_install_protheus = <<-SCRIPT
-
-	# criando a estrutura das pastas para instalação do protheus
-	# este script busca dentro do arte da engenharia, todos os componentes atualizados para provisionar a base.
-	# uma vez provisionado, o ambiente sempre trabalhará com o ultimo rpo (d-1) disponibilizado, caso queira manter o teste
-	sudo echo 'criando estrutura de pastas'
-	sudo mkdir -p /protheus && \
-	sudo mkdir -p /protheus/apo && \
-	sudo mkdir -p /protheus/bin && \
-	sudo mkdir -p /protheus/bin/appserver && \
-	sudo mkdir -p /protheus/protheus_data && \
-	sudo mkdir -p /protheus/protheus_data/data && \
-	sudo mkdir -p /protheus/protheus_data/systemload && \
-	sudo mkdir -p /protheus/protheus_data/systemload/updmenu && \
-	sudo mkdir -p /protheus/protheus_data/web && \
-
-	# db --> dicionario no banco
-	# ds --> dicionario no system
-	# configurar o ini do protheus (manifests/protheus_appserver.ini) todos os ambientes para direcionar para estas pastas.
-	# no caso do mssqlserver, deve-se ter o mesmo instalado em sua maquina, ou direcionado para um odbc instalado na rede
-	# IMPORTANTE: Todas as vezes que provisionar a maquina, os dados de SX serão apagados e deverão ser recriados novamente, desta forma, recomendamos sempre utilizar o ambiente db
-	sudo mkdir -p /protheus/protheus_data/system && \	
-	sudo mkdir -p /protheus/protheus_data/system/modelo && \	
-	sudo mkdir -p /protheus/protheus_data/system/mssqlserver_db && \	
-	sudo mkdir -p /protheus/protheus_data/system/mssqlserver_ds && \	
-	sudo mkdir -p /protheus/protheus_data/system/oracle_db && \	
-	sudo mkdir -p /protheus/protheus_data/system/oracle_ds && \	
-	sudo mkdir -p /protheus/protheus_data/system/postgresql_db && \	
-	sudo mkdir -p /protheus/protheus_data/system/postgresql_ds && \	
-	sudo mkdir -p /protheus/protheus_data/system/db2_db && \	
-	sudo mkdir -p /protheus/protheus_data/system/db2_ds && \	
-	
-	########## ARTEFATOS DO BINARIO ##########
-	# para realizar o download dos artefatos, utilizamos os nomes comuns disponibilizados pela engenharia, desta forma, a tendencia de manutenção no mesmo fica reduzida.
-	sudo echo 'realizando download dos arquivos de instalação'
-	cd /protheus/bin/appserver && \
-	sudo wget https://arte.engpro.totvs.com.br/tec/appserver/lobo_guara/linux/64/published/appserver.tar.gz && \
-	sudo tar -xvzf appserver.tar.gz && \
-	sudo rm -f *.tar.gz && \
-	sudo chmod 777 *.so && \
-
-	sudo wget https://arte.engpro.totvs.com.br/tec/smartclientwebapp/lobo_guara/linux/64/published/webapp.tar.gz && \
-	sudo tar -xvzf webapp.tar.gz && \
-	sudo rm -f *.tar.gz && \
-
-	########## RPO ##########
-	# Faremos um scrit para download automatico do RPO apos o provisionamento das maquinas
-	# para a primeira instalação, sempre copiamos o rpo atual.
-	cd /protheus/apo && \
-	sudo wget https://arte.engpro.totvs.com.br/protheus/padrao/published/repositorio/lobo_guara/tttp120.rpo && \
-
-	
-	########## ARTEFATOS DO SYSTEM ##########
-	cd /protheus/protheus_data/system/modelo && \
-	sudo wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/arquivos_de_configuracao/19-02-14-ARQUIVOS_CONFIGURACAO_FISCAL_12_1_23.ZIP && \
-	sudo wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/arquivos_de_configuracao/19-02-15-ARQUIVOS_PORTAL_E_WIZARD_SIGAPLS_12.1.23.ZIP && \
-	sudo wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/stored_procedures/19-02-15-STORED_PROCEDURES_TODAS_V12.1.23.ZIP && \
-	sudo wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/menus/completo/19-02-15-BRA-MENUS_12_1_23.ZIP  && \
-	sudo unzip -o 19-02-14-ARQUIVOS_CONFIGURACAO_FISCAL_12_1_23.ZIP && \
-	sudo unzip -o 19-02-15-ARQUIVOS_PORTAL_E_WIZARD_SIGAPLS_12.1.23.ZIP && \
-	sudo unzip -o 19-02-15-STORED_PROCEDURES_TODAS_V12.1.23.ZIP && \
-	sudo unzip -o 19-02-15-BRA-MENUS_12_1_23.ZIP && \
-	sudo unzip -o 'arquivos CSV.zip' && \
-	sudo unzip -o 'arquivos JS.zip' && \
-	sudo rm -f *12_1_23.ZIP && \
-
-	sudo cp -f -r * ../mssqlserver_db && \
-	sudo cp -f -r * ../oracle_db && \
-	sudo cp -f -r * ../postgresql_db && \
-	sudo cp -f -r * ../db2_db && \
-	sudo cp -f -r * ../mssqlserver_ds && \
-	sudo cp -f -r * ../oracle_ds && \
-	sudo cp -f -r * ../postgresql_ds && \
-	sudo cp -f -r * ../db2_ds && \
-
-	########## ARTEFATOS DO SYSTEMLOAD ##########
-	cd /protheus/protheus_data/systemload && \
-    sudo wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/dicionario_de_dados/completo/19-02-15-BRA-DICIONARIOS_COMPL_12_1_23.ZIP	 && \
-    sudo wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/dicionario_de_dados/diferencial/19-02-15-BRA-DICIONARIOS_DIF_12_1_23.ZIP && \
-	sudo wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/help_de_campo/completo/19-02-14-BRA-HELPS_COMPL_12_1_23.ZIP && \
-	sudo unzip -o 19-02-15-BRA-DICIONARIOS_COMPL_12_1_23.ZIP && \
-	sudo unzip -o 19-02-15-BRA-DICIONARIOS_DIF_12_1_23.ZIP && \
-	sudo unzip -o 19-02-14-BRA-HELPS_COMPL_12_1_23.ZIP && \
-	sudo rm -f *12_1_23.ZIP && \
-	cd /protheus/protheus_data/systemload/bra && \
-	sudo cp * .. && \
-	cd .. && \
-	sudo rm bra/* -f  && \
-	sudo rmdir bra &&\
-
-	cd /protheus/protheus_data/systemload/updmenu && \
-	sudo wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/menus/completo/19-02-15-BRA-MENUS_12_1_23.ZIP  && \
-	sudo unzip -o 19-02-15-BRA-MENUS_12_1_23.ZIP && \
-	sudo rm -f *12_1_23.ZIP && \
-
-	cd /protheus/protheus_data/web && \
-	sudo wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/web-files/19-02-15-WEB-FILES-P12.1.23.ZIP && \
-	sudo unzip -o 19-02-15-WEB-FILES-P12.1.23.ZIP && \
-	sudo rm -f *12.1.23.ZIP
-SCRIPT
-
-$script_install_lockserver = <<-SCRIPT
-
-	sudo echo 'criando estrutura de pastas'
-	sudo mkdir -p /protheus && \
-	sudo mkdir -p /protheus/apo && \
-	sudo mkdir -p /protheus/bin && \
-	sudo mkdir -p /protheus/bin/appserver && \
-
-	sudo echo 'realizando download dos arquivos de instalação'
-
-	cd /protheus/bin/appserver && \
-	sudo wget https://arte.engpro.totvs.com.br/tec/appserver/lobo_guara/linux/64/published/appserver.tar.gz && \
-	sudo tar -xvzf appserver.tar.gz && \
-	sudo rm -f *.tar.gz && \
-	sudo chmod 777 *.so
-SCRIPT
-
-$script_lockserver_start = <<-SCRIPT
-	sudo cp /install/manifests/init-lockserver.sh /usr/local/bin/init-lockserver.sh && \
-	sudo sed -i -e 's/\r$//' /usr/local/bin/init-lockserver.sh && \
-	sudo chmod +x /usr/local/bin/* /usr/bin/* && \
-	sudo echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin &&\
-	sudo cp /install/manifests/init-lockserver.service /etc/systemd/init-lockserver.service && \
-	sudo sed -i -e 's/\r$//' /etc/systemd/init-lockserver.service && \
-    sudo chmod 664 /etc/systemd/init-lockserver.service && \
-	sudo systemctl daemon-reload && \
-	sudo systemctl enable /etc/systemd/init-lockserver.service && \
-	sudo systemctl start init-lockserver.service
-SCRIPT
-
-$script_protheus_start = <<-SCRIPT
-	sudo cp /install/manifests/init-protheus.sh /usr/local/bin/init-protheus.sh && \
-	sudo sed -i -e 's/\r$//' /usr/local/bin/init-protheus.sh && \
-	sudo chmod +x /usr/local/bin/* /usr/bin/* && \
-	sudo echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin &&\
-	sudo cp /install/manifests/init-protheus.service /etc/systemd/init-protheus.service && \
-	sudo sed -i -e 's/\r$//' /etc/systemd/init-protheus.service && \
-    sudo chmod 664 /etc/systemd/init-protheus.service && \
-	sudo systemctl daemon-reload && \
-	sudo systemctl enable /etc/systemd/init-protheus.service && \
-	sudo systemctl start init-protheus.service
-SCRIPT
-
-$script_protheus_rest_start = <<-SCRIPT
-	sudo cp /install/manifests/init-protheus-rest.sh /usr/local/bin/init-protheus-rest.sh && \
-	sudo sed -i -e 's/\r$//' /usr/local/bin/init-protheus-rest.sh && \
-	sudo chmod +x /usr/local/bin/* /usr/bin/* && \
-	sudo echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin
-	sudo cp /install/manifests/init-protheus_rest.service /etc/systemd/init-protheus_rest.service && \
-	sudo sed -i -e 's/\r$//' /etc/systemd/init-protheus_rest.service && \
-    sudo chmod 664 /etc/systemd/init-protheus_rest.service && \
-	sudo systemctl daemon-reload && \
-	sudo systemctl enable /etc/systemd/init-protheus_rest.service && \
-	sudo systemctl start init-protheus_rest.service
-SCRIPT
-
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
@@ -211,9 +15,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.synced_folder "./install", "/install"
   config.vm.synced_folder "./logs", "/logs"
 
-  # config.vm.provision "shell", inline: "cat /install/autorization.pub >> .ssh/authorized_keys"
-  config.vm.provision "shell", inline: $script_init
-
   # workaround the vagrant 1.8.5 bug
   # config.ssh.insert_key = false
  
@@ -224,7 +25,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	postgres.vm.network "forwarded_port", guest: 22, host: 2300
 
 	postgres.vm.provider "virtualbox" do |v_postgres|
-		# change memory size
 		v_postgres.memory = 2048
 		v_postgres.cpus = 2
 		v_postgres.name = "postgres-svc"
@@ -233,10 +33,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		v_postgres.customize ["modifyvm", :id, "--cpuexecutioncap", "100"]
 	end
     
-	# postgres.vm.provision "shell", inline: $script_postgres
-	# postgres.vm.provision "shell", path: "./install/scripts/postgres_install.sh"
-	# postgres.vm.provision "shell", path: "./install/scripts/dbaccess_install.sh"
-	postgres.vm.provision "shell", inline: $script_dbaccess
+	postgres.vm.provision "shell", path: "./install/scripts/postgres_install.sh"
+	postgres.vm.provision "shell", path: "./install/scripts/dbaccess_install.sh"
 
 	# apos iniciar o servidor, subir o dbaccess
 	postgres.trigger.after :up do |trigger|
@@ -250,7 +48,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       trigger.run_remote = {inline: "pg_dump protheus_db > /logs/protheus_db.dump"}
       trigger.run_remote = {inline: "pg_dump protheus_system > /logs/protheus_system.dump"}
     end
-
   end
  
   config.vm.define "oracle" do |oracle|
@@ -259,7 +56,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	oracle.vm.network "forwarded_port", guest: 22, host: 2300
 
 	oracle.vm.provider "virtualbox" do |v_oracle|
-		# change memory size
 		v_oracle.memory = 2048
 		v_oracle.cpus = 2
 		v_oracle.name = "oracle12c-svc"
@@ -287,10 +83,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     lockserver.vm.network :private_network, ip: "192.168.56.10"
 	lockserver.vm.network "forwarded_port", guest: 22, host: 2210
 	lockserver.vm.hostname = "protheus-lockserver-svc"
-	# lockserver.vm.provision "shell", path: "./install/scripts/lockserver_install.sh"
-    lockserver.vm.provision "shell", inline: $script_install_lockserver
-	lockserver.vm.provision "shell", inline: $script_lockserver_start
 	lockserver.vm.synced_folder "./protheus_ini", "/protheus_ini"
+	lockserver.vm.provision "shell", path: "./install/scripts/protheus_minimal_install.sh"
 	
 	lockserver.trigger.after :up do |t_lockserver|
       t_lockserver.warn = "Iniciando lockserver"
@@ -310,8 +104,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	protheus.vm.hostname = "protheus-svc"
 	protheus.vm.network "private_network", ip: "192.168.56.20"
-    protheus.vm.provision "shell", inline: $script_install_protheus
-	protheus.vm.provision "shell", inline: $script_protheus_start
+	
+	protheus.vm.provision "shell", path: "./install/scripts/protheus_install.sh"
+
 	protheus.vm.synced_folder "./pasta_sincronizada", "/protheus/protheus_data/pasta_sincronizada"
 	protheus.vm.synced_folder "./protheus_ini", "/protheus_ini"
 
@@ -322,14 +117,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "protheus_rest" do |protheus_rest|
-	protheus_rest.vm.network :private_network, ip: "192.168.56.30"
-	protheus_rest.vm.network "forwarded_port", guest: 22, host: 2230
-	protheus_rest.vm.hostname = "protheus-rest-svc"
+    protheus_rest.vm.provider "virtualbox" do |v_protheus_rest|
+      v_protheus_rest.memory = 1024
+      v_protheus_rest.cpus = 1
+      v_protheus_rest.name = "protheus_rest-svc"
+	  v_protheus_rest.customize ["modifyvm", :id, "--cableconnected1", "on"]
+	  v_protheus_rest.customize ["modifyvm", :id, "--cpuexecutioncap", "80"]
+	  v_protheus_rest.customize ["modifyvm", :id, "--audio", "none"]
+	end
 
-    protheus_rest.vm.provision "shell", inline: $script_install_protheus
-	protheus_rest.vm.provision "shell", inline: $script_protheus_rest_start
+	protheus_rest.vm.hostname = "protheus_rest-svc"
+	protheus_rest.vm.network "private_network", ip: "192.168.56.30"
+	protheus_rest.vm.provision "shell", path: "./install/scripts/protheus_minimal_install.sh"
+
+	protheus_rest.vm.synced_folder "./pasta_sincronizada", "/protheus/protheus_data/pasta_sincronizada"
 	protheus_rest.vm.synced_folder "./protheus_ini", "/protheus_ini"
 
+	protheus_rest.trigger.after :up do |t_protheus_rest|
+      t_protheus_rest.warn = "Iniciando protheus"
+      t_protheus_rest.run_remote = {inline: "sudo systemctl start init-protheus-rest.service"}
+    end
   end
 end
 

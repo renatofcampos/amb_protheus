@@ -6,7 +6,18 @@ yum update -y
 yum install -y wget
 yum install -y unzip
 yum install -y tar
+yum install -y telnet 
+yum install -y vim 
 yum install -y epel-release
+
+yum clean all
+
+rm -rf /var/cache/yum
+
+wget -O /usr/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64
+chmod +x /usr/bin/dumb-init
+COPY . /
+RUN chmod +x /usr/local/bin/*
 
 # atualização dos pacotes de atualização do centos
 rpm -Uvh https://yum.postgresql.org/10/redhat/rhel-7-x86_64/pgdg-centos10-10-2.noarch.rpm
@@ -24,51 +35,26 @@ rm -rf /var/cache/yum
 systemctl enable postgresql-10
 systemctl start postgresql-10
 
-# criando o usuario padrao
-su - postgres -s /bin/bash -c "/usr/bin/createuser protheus"
+# criando o usuario padrao (superuser)
+su - postgres -s /bin/bash -c "/usr/bin/createuser protheus -s"
 
 # criando banco de dados
-su - postgres -s /bin/bash -c "/usr/bin/createdb -E LATIN1 -T template0 --lc-collate=pt_BR.ISO-8859-1 --lc-ctype=pt_BR.ISO-8859-1 protheus_system"
-su - postgres -s /bin/bash -c "/usr/bin/createdb -E LATIN1 -T template0 --lc-collate=pt_BR.ISO-8859-1 --lc-ctype=pt_BR.ISO-8859-1 protheus_db"
+su - postgres -s /bin/bash -c "/usr/bin/createdb -E LATIN1 -T template0 --lc-collate=C --lc-ctype=C protheus_system"
+su - postgres -s /bin/bash -c "/usr/bin/createdb -E LATIN1 -T template0 --lc-collate=C --lc-ctype=C protheus_db"
 
-# configurando odbc
-cat << EOF >> /etc/odbc.ini
-[protheus_db]
-Description=PostgreSQL connection to protheus_db
-Driver=PostgreSQL
-Database=protheus_db
-Servername=192.168.56.100
-Port=5432
-ReadOnly=0
-MaxLongVarcharSize=2000
-UnknownSizes=2
-UseServerSidePrepare=1
+su - postgres -s /bin/bash -c "/usr/bin/psql -U protheus protheus_db -f alter user protheus with encrypted password 'protheus'"
 
-[protheus_system]
-Description=PostgreSQL connection to protheus_system
-Driver=PostgreSQL
-Database=protheus_system
-Servername=192.168.56.100
-Port=5432
-ReadOnly=0
-MaxLongVarcharSize=2000
-UnknownSizes=2
-UseServerSidePrepare=1
+systemctl stop postgresql-10
 
-EOF
+# realiza a instalação do Driver do ODBC
+odbcinst -i -d -f /install/manifests/etc/odbcinst.ini
 
+# realiza a instalação do ODBC
+odbcinst -i -s -f /install/manifests/etc/odbc.ini
 
-# criação da pasta do dbaccess
-mkdir -p /dbaccess
-mkdir -p /logs
-cd /dbaccess
+# realizo a copia dos arquivos de configuração do postgres
+sudo cp /install/manifests/var/lib/pgsql/10/data/*.conf /var/lib/pgsql/10/data/
 
-wget https://arte.engpro.totvs.com.br/tec/dbaccess/linux/64/published/dbaccess.tar.gz && \
-tar -xvzf dbaccess.tar.gz && \
-cp multi/dbaccess64 dbaccess64 && \
-cp multi/dbaccess64.so dbaccess64.so
+systemctl start postgresql-10
 
-
-
-	
-	
+echo 'Instalação do PostgreSQL concluida'
