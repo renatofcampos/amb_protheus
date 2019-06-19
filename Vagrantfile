@@ -1,39 +1,40 @@
-# sudo yum install -y --setopt=protected_multilib=false     glibc.i686     libicu     libuuid.so.1     libfontconfig.so.1     libgthread-2.0.so.0     unixODBC-devel     awscli     s3fs-fuse     && \
-
 $script_init = <<-SCRIPT
+	sudo yum update -y && \
+
 	sudo yum install -y wget &&\
 	sudo yum install -y unzip &&\
 	sudo yum install -y tar &&\
+	sudo yum install -y telnet &&\
+	sudo yum install -y vim &&\
 	sudo yum install -y epel-release  && \
 	sudo yum install -y binutils.x86_64 compat-libcap1.x86_64 gcc.x86_64 gcc-c++.x86_64 glibc.i686 glibc.x86_64 glibc-devel.i686 glibc-devel.x86_64 ksh compat-libstdc++-33 libaio.i686 libaio.x86_64 libaio-devel.i686 libaio-devel.x86_64 libgcc.i686 libgcc.x86_64 libstdc++.i686 libstdc++.x86_64 libstdc++-devel.i686 libstdc++-devel.x86_64 libXi.i686 libXi.x86_64 libXtst.i686 libXtst.x86_64 make.x86_64 sysstat.x86_64 which && \
 	sudo yum install -y puppet-server &&\
 	sudo yum clean all     && \
-	sudo rm -rf /var/cache/yum
+	sudo rm -rf /var/cache/yum    && \
 
-	sudo sed '/(soft nofile)/d' /etc/security/limits.conf
-	sudo sed '/(hard nofile)/d' /etc/security/limits.conf
-	sudo echo 'soft nofile 32768' >> /etc/security/limits.conf
-	sudo echo 'hard nofile 32768' >> /etc/security/limits.conf
+	sudo sed '/(soft nofile)/d' /etc/security/limits.conf    && \
+	sudo sed '/(hard nofile)/d' /etc/security/limits.conf    && \
+	sudo echo 'soft nofile 32768' >> /etc/security/limits.conf    && \
+	sudo echo 'hard nofile 32768' >> /etc/security/limits.conf    && \
 	sudo chsh -s /bin/bash vagrant
 SCRIPT
 
-$script_postgres = <<-SCRIPT
-	sudo mkdir -p /totvs/dbaccess && \
-	sudo mkdir -p /totvs/logs && \
+$script_dbaccess = <<-SCRIPT
+	sudo mkdir -p /dbaccess && \
+	sudo mkdir -p /logs && \
 	sudo cd /totvs/dbaccess && \
+
 	sudo wget https://arte.engpro.totvs.com.br/tec/dbaccess/linux/64/published/dbaccess.tar.gz && \
 	sudo tar -xvzf dbaccess.tar.gz && \
-	sudo yum install postgresql-server postgresql-contrib  -y && \
-	sudo yum clean all     && \
-	sudo rm -rf /var/cache/yum && \
-	sudo postgresql-setup initdb && \
-	sudo systemctl start postgresql  && \
-	sudo systemctl enable postgresql  && \
-	sudo passwd postgres && \
-	su - postgres && \
-	su --shell /bin/bash postgres && \
-	su - postgres && \
-	psql -d template1 -c "ALTER USER postgres WITH PASSWORD 'postgres';"
+	sudo cp multi/dbaccess64 dbaccess64
+	sudo cp multi/dbaccess64.so dbaccess64.so
+
+	sudo cp /install/manifests/init-dbaccess.service /etc/systemd/init-dbaccess.service && \
+	sudo sed -i -e 's/\r$//' /etc/systemd/init-dbaccess.service && \
+    sudo chmod 664 /etc/systemd/init-dbaccess.service && \
+	sudo systemctl daemon-reload && \
+	sudo systemctl enable /etc/systemd/init-dbaccess.service && \
+	sudo systemctl start init-dbaccess.service
 SCRIPT
 
 $script_install_protheus = <<-SCRIPT
@@ -185,32 +186,40 @@ $script_protheus_rest_start = <<-SCRIPT
 	sudo sed -i -e 's/\r$//' /usr/local/bin/init-protheus-rest.sh && \
 	sudo chmod +x /usr/local/bin/* /usr/bin/* && \
 	sudo echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin
+	sudo cp /install/manifests/init-protheus_rest.service /etc/systemd/init-protheus_rest.service && \
+	sudo sed -i -e 's/\r$//' /etc/systemd/init-protheus_rest.service && \
+    sudo chmod 664 /etc/systemd/init-protheus_rest.service && \
+	sudo systemctl daemon-reload && \
+	sudo systemctl enable /etc/systemd/init-protheus_rest.service && \
+	sudo systemctl start init-protheus_rest.service
 SCRIPT
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "bento/centos-7.2"
-  config.ssh.insert_key = false
+  # config.vm.box = "bento/centos-7.2"
+  config.vm.box = "centos/7"
+
+  #config.ssh.insert_key = false
   #config.vm.provision "file", source: "~/.ssh/autorization.pub", destination: "~/.ssh/authorized_keys"
   #config.ssh.private_key_path = ["~/.ssh/autorization", "~/.vagrant.d/insecure_private_key"]
-  config.ssh.username = "vagrant"
-  config.ssh.password = "vagrant"
+  #config.ssh.username = "vagrant"
+  #config.ssh.password = "vagrant"
 
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder "./install", "/install"
   config.vm.synced_folder "./logs", "/logs"
 
-  config.vm.provision "shell", inline: "cat /install/autorization.pub >> .ssh/authorized_keys"
+  # config.vm.provision "shell", inline: "cat /install/autorization.pub >> .ssh/authorized_keys"
   config.vm.provision "shell", inline: $script_init
 
   # workaround the vagrant 1.8.5 bug
-  config.ssh.insert_key = false
+  # config.ssh.insert_key = false
  
   # maquina postgres	  
   config.vm.define "postgres" do |postgres|
-	postgres.vm.hostname = "dbaccess-svc"
+	postgres.vm.hostname = "postgres-svc"
     postgres.vm.network :private_network, ip: "192.168.56.100"
 	postgres.vm.network "forwarded_port", guest: 22, host: 2300
 
@@ -222,18 +231,31 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		v_postgres.customize ["modifyvm", :id, "--cableconnected1", "on"]
 		v_postgres.customize ["modifyvm", :id, "--ioapic", "on"]
 		v_postgres.customize ["modifyvm", :id, "--cpuexecutioncap", "100"]
-		
-		# postgres port forwarding
-		v_postgres.vm.network "forwarded_port", guest: 1521, host: 1521
 	end
+    
+	# postgres.vm.provision "shell", inline: $script_postgres
+	# postgres.vm.provision "shell", path: "./install/scripts/postgres_install.sh"
+	# postgres.vm.provision "shell", path: "./install/scripts/dbaccess_install.sh"
+	postgres.vm.provision "shell", inline: $script_dbaccess
+
+	# apos iniciar o servidor, subir o dbaccess
+	postgres.trigger.after :up do |trigger|
+      trigger.warn = "Iniciando Banco de dados"
+      trigger.run_remote = {inline: "sudo systemctl start init-dbaccess.service"}
+    end
 	
-    postgres.vm.provision "shell", inline: $script_postgres
-    postgres.vm.provision "shell", inline: "service postgresql restart"
+	# antes de destruir a maquina, tirar um backup do banco
+	postgres.trigger.before :destroy do |trigger|
+      trigger.warn = "Dumping database to /logs"
+      trigger.run_remote = {inline: "pg_dump protheus_db > /logs/protheus_db.dump"}
+      trigger.run_remote = {inline: "pg_dump protheus_system > /logs/protheus_system.dump"}
+    end
+
   end
  
   config.vm.define "oracle" do |oracle|
 	oracle.vm.hostname = "dbaccess-svc"
-    oracle.vm.network :private_network, ip: "192.168.56.100"
+    oracle.vm.network :private_network, ip: "192.168.56.101"
 	oracle.vm.network "forwarded_port", guest: 22, host: 2300
 
 	oracle.vm.provider "virtualbox" do |v_oracle|
@@ -244,19 +266,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		v_oracle.customize ["modifyvm", :id, "--cableconnected1", "on"]
 		v_oracle.customize ["modifyvm", :id, "--ioapic", "on"]
 		v_oracle.customize ["modifyvm", :id, "--cpuexecutioncap", "100"]
-		
-		# Oracle port forwarding
-		v_oracle.vm.network "forwarded_port", guest: 1521, host: 1521
-
-		# Provision everything on the first run
-		v_oracle.vm.provision "shell", path: "/install/scripts/oracle_install.sh"
-		v_oracle.vm.synced_folder "./oradata", "/install/oradata", owner: "oracle", group: "oinstall"
 	end
+
+	# Oracle port forwarding
+	oracle.vm.network "forwarded_port", guest: 1521, host: 1521
+
+	# Provision everything on the first run
+	oracle.vm.provision "shell", path: "./install/scripts/oracle_install.sh"
+	oracle.vm.synced_folder "./oradata", "/install/oradata", owner: "oracle", group: "oinstall"
+
   end
 
   config.vm.define "lockserver" do |lockserver|
     lockserver.vm.provider "virtualbox" do |v_lockserver|
-      v_lockserver.memory = 512
+      v_lockserver.memory = 1024
       v_lockserver.cpus = 1
       v_lockserver.name = "protheus-lockserver-svc"
     end
@@ -264,9 +287,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     lockserver.vm.network :private_network, ip: "192.168.56.10"
 	lockserver.vm.network "forwarded_port", guest: 22, host: 2210
 	lockserver.vm.hostname = "protheus-lockserver-svc"
+	# lockserver.vm.provision "shell", path: "./install/scripts/lockserver_install.sh"
     lockserver.vm.provision "shell", inline: $script_install_lockserver
 	lockserver.vm.provision "shell", inline: $script_lockserver_start
-	lockserver.vm.synced_folder "./protheus_ini", "/configuracoes"
+	lockserver.vm.synced_folder "./protheus_ini", "/protheus_ini"
+	
+	lockserver.trigger.after :up do |t_lockserver|
+      t_lockserver.warn = "Iniciando lockserver"
+      t_lockserver.run_remote = {inline: "sudo systemctl start init-lockserver.service"}
+    end
   end  
  
   config.vm.define "protheus" do |protheus|
@@ -284,7 +313,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     protheus.vm.provision "shell", inline: $script_install_protheus
 	protheus.vm.provision "shell", inline: $script_protheus_start
 	protheus.vm.synced_folder "./pasta_sincronizada", "/protheus/protheus_data/pasta_sincronizada"
-	protheus.vm.synced_folder "./protheus_ini", "/configuracoes"
+	protheus.vm.synced_folder "./protheus_ini", "/protheus_ini"
+
+	protheus.trigger.after :up do |t_protheus|
+      t_protheus.warn = "Iniciando protheus"
+      t_protheus.run_remote = {inline: "sudo systemctl start init-protheus.service"}
+    end
   end
 
   config.vm.define "protheus_rest" do |protheus_rest|
@@ -294,7 +328,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     protheus_rest.vm.provision "shell", inline: $script_install_protheus
 	protheus_rest.vm.provision "shell", inline: $script_protheus_rest_start
-	protheus_rest.vm.synced_folder "./protheus_ini", "/configuracoes"
+	protheus_rest.vm.synced_folder "./protheus_ini", "/protheus_ini"
 
   end
 end

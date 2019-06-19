@@ -1,0 +1,8 @@
+[Unit]
+#After=
+
+[Service]
+ExecStart=/usr/local/bin/init-dbaccess.sh
+
+[Install]
+WantedBy=default.target
