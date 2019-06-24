@@ -24,13 +24,13 @@ cp multi/dbaccess64.so dbaccess64.so
 rm -f *.tar.gz
 
 echo 'DbAccess|Iniciando configuração do DbAccess'
-cp /protheus_ini/dbaccess.ini .
+cp /install/manifests/dbaccess.ini .
 sed -i -e 's/\r$//' dbaccess.ini
 
-cp /install/manifests/init-dbaccess.sh /usr/local/bin/init-dbaccess.sh
+cp /install/manifests/usr/local/bin/init-dbaccess.sh /usr/local/bin/init-dbaccess.sh
 sed -i -e 's/\r$//' /usr/local/bin/init-dbaccess.sh
 	
-cp /install/manifests/init-dbaccess.service /etc/systemd/init-dbaccess.service 
+cp /install/manifests/etc/systemd/init-dbaccess.service /etc/systemd/init-dbaccess.service 
 sed -i -e 's/\r$//' /etc/systemd/init-dbaccess.service 
 
 chmod 664 /etc/systemd/init-dbaccess.service 

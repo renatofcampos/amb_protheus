@@ -22,7 +22,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "postgres" do |postgres|
 	postgres.vm.hostname = "postgres-svc"
     postgres.vm.network :private_network, ip: "192.168.56.100"
-	postgres.vm.network "forwarded_port", guest: 22, host: 2300
+	postgres.vm.network :forwarded_port, guest: 5432, host: 5432
 
 	postgres.vm.provider "virtualbox" do |v_postgres|
 		v_postgres.memory = 2048

@@ -1,5 +1,37 @@
 #!/bin/sh
 
+PG_VERSION=10
+DB_USER=protheus
+DB_PASS=protheus
+DB_NAME_SF=protheus_system
+DB_NAME_DB=protheus_db
+
+
+print_db_usage () {
+  echo "PostgreSQL esta instalado e poderá ser acessado pela porta: 15432 (forward do vagrant)"
+  echo "  Host: localhost"
+  echo "  Port: 15432"
+  echo "  Database 1: $DB_NAME_SF"
+  echo "  Database 2: $DB_NAME_DB"
+  echo "  Username: $DB_USER"
+  echo "  Password: $DB_PASS"
+  echo ""
+  echo "Admin possui acesso ao postgres via a VM:"
+  echo "  vagrant ssh"
+  echo "  sudo su - postgres"
+  echo ""
+  echo "psql possui acesso ao database via user VM:"
+  echo "  vagrant ssh"
+  echo "  sudo su - postgres"
+  echo "  PGUSER=$DB_USER PGPASSWORD=$DB_PASS psql -h localhost $DB_NAME_SF"
+  echo ""
+  echo "Variavel do ambiente liberado em: "
+  echo "  DATABASE_URL=postgresql://$DB_USER:$DB_PASS@localhost:15432/$DB_NAME_SF"
+  echo ""
+  echo "psql:"
+  echo "  PGUSER=$DB_USER PGPASSWORD=$DB_PASS psql -h localhost -p 15432 $DB_NAME_SF"
+}
+
 echo 'Iniciando a instalação do PostgreSQL'
 
 yum update -y 
@@ -16,7 +48,7 @@ rm -rf /var/cache/yum
 
 wget -O /usr/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64
 chmod +x /usr/bin/dumb-init
-COPY . /
+cp . /
 RUN chmod +x /usr/local/bin/*
 
 # atualização dos pacotes de atualização do centos
@@ -35,15 +67,56 @@ rm -rf /var/cache/yum
 systemctl enable postgresql-10
 systemctl start postgresql-10
 
-# criando o usuario padrao (superuser)
-su - postgres -s /bin/bash -c "/usr/bin/createuser protheus -s"
+echo "Criando bancos de dados para utilização no protheus"
 
-# criando banco de dados
-su - postgres -s /bin/bash -c "/usr/bin/createdb -E LATIN1 -T template0 --lc-collate=C --lc-ctype=C protheus_system"
-su - postgres -s /bin/bash -c "/usr/bin/createdb -E LATIN1 -T template0 --lc-collate=C --lc-ctype=C protheus_db"
+cat << EOF | su - postgres -c psql
+CREATE ROLE vagrant SUPERUSER LOGIN PASSWORD 'vagrant';
+CREATE ROLE $DB_USER SUPERUSER LOGIN PASSWORD '$DB_PASS';
 
-su - postgres -s /bin/bash -c "/usr/bin/psql -U protheus protheus_db -f alter user protheus with encrypted password 'protheus'"
 
+-- Create the database user:
+-- CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';
+
+-- Cria o primeiro banco
+CREATE DATABASE $DB_NAME_SF WITH OWNER=$DB_USER
+                                 LC_COLLATE='C'
+                                 LC_CTYPE='C'
+                                 ENCODING='LATIN1'
+                                 TEMPLATE=template0;
+
+-- Cria o primeiro banco
+CREATE DATABASE $DB_NAME_DB WITH OWNER=$DB_USER
+                                 LC_COLLATE='C'
+                                 LC_CTYPE='C'
+                                 ENCODING='LATIN1'
+                                 TEMPLATE=template0;
+
+EOF
+
+#echo "Alterando senhas para utilização no dbaccess"
+#cat << EOF | su - postgres -c psql $DB_NAME_DB 
+#alter user $DB_USER with encrypted password '$DB_PASS';
+#EOF
+#
+#cat << EOF | su - postgres -c psql $DB_NAME_FS 
+#alter user $DB_USER with encrypted password '$DB_PASS';
+#EOF
+
+echo "Configurando o postgres para utilização do dbaccess"
+
+PG_CONF="/var/lib/pgsql/$PG_VERSION/data/postgresql.conf"
+PG_HBA="/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf"
+
+# Edit postgresql.conf to change listen address to '*':
+sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" "$PG_CONF"
+
+# Append to pg_hba.conf to add password auth:
+echo "host    all             all             all                     trust" >> "$PG_HBA"
+sed -i "s/local   all             all                                     peer/local   all             all                                     trust/" "$PG_HBA"
+
+systemctl restart postgresql-10 
+
+echo "Instalando ODBCs"
 systemctl stop postgresql-10
 
 # realiza a instalação do Driver do ODBC
@@ -52,9 +125,9 @@ odbcinst -i -d -f /install/manifests/etc/odbcinst.ini
 # realiza a instalação do ODBC
 odbcinst -i -s -f /install/manifests/etc/odbc.ini
 
-# realizo a copia dos arquivos de configuração do postgres
-sudo cp /install/manifests/var/lib/pgsql/10/data/*.conf /var/lib/pgsql/10/data/
-
 systemctl start postgresql-10
 
 echo 'Instalação do PostgreSQL concluida'
+echo ""
+
+print_db_usage

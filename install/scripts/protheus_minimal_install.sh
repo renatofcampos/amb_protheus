@@ -58,9 +58,9 @@ echo 'Protheus|Instalação MINIMA do Protheus concluida'
 
 echo 'Protheus|Instalando serviços dentro da maquina'
 
-cp /install/manifests/init-protheus.sh /usr/local/bin/init-protheus.sh 
-cp /install/manifests/init-protheus-rest.sh /usr/local/bin/init-protheus-rest.sh 
-cp /install/manifests/init-lockserver.sh /usr/local/bin/init-lockserver.sh 
+cp /install/manifests/usr/local/bin/init-protheus.sh /usr/local/bin/init-protheus.sh 
+cp /install/manifests/usr/local/bin/init-protheus-rest.sh /usr/local/bin/init-protheus-rest.sh 
+cp /install/manifests/usr/local/bin/init-lockserver.sh /usr/local/bin/init-lockserver.sh 
 
 sed -i -e 's/\r$//' /usr/local/bin/*.sh 
 
@@ -68,9 +68,9 @@ chmod +x /usr/local/bin/* /usr/bin/*
 
 echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin 
 
-cp /install/manifests/init-protheus.service /etc/systemd/init-protheus.service 
-cp /install/manifests/init-protheus-rest.service /etc/systemd/init-protheus-rest.service 
-cp /install/manifests/init-lockserver.service /etc/systemd/init-lockserver.service 
+cp /install/manifests/etc/systemd/init-protheus.service /etc/systemd/init-protheus.service 
+cp /install/manifests/etc/systemd/init-protheus-rest.service /etc/systemd/init-protheus-rest.service 
+cp /install/manifests/etc/systemd/init-lockserver.service /etc/systemd/init-lockserver.service 
 
 sed -i -e 's/\r$//' /etc/systemd/init-protheus.service 
 sed -i -e 's/\r$//' /etc/systemd/init-protheus-rest.service 
