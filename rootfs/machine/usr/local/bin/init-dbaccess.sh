@@ -2,7 +2,7 @@
 set -e
 
 echo atualizando appserver.ini
-cp /install/manifests/dbaccess.ini /dbaccess/dbaccess.ini
+cp /rootfs/machine/dbaccess.ini /dbaccess/dbaccess.ini
 
 echo Executing dbaccess
 

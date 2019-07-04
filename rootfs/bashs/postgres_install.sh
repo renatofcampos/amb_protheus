@@ -127,10 +127,10 @@ echo "Instalando ODBCs"
 systemctl stop postgresql-10
 
 # realiza a instalação do Driver do ODBC
-odbcinst -i -d -f /install/manifests/etc/odbcinst.ini
+odbcinst -i -d -f /rootfs/machine/etc/odbcinst.ini
 
 # realiza a instalação do ODBC
-odbcinst -i -s -f /install/manifests/etc/odbc.ini
+odbcinst -i -s -f /rootfs/machine/etc/odbc.ini
 
 systemctl start postgresql-10
 

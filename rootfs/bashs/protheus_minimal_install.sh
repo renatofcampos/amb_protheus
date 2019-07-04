@@ -30,7 +30,7 @@ echo 'Protheus|Iniciando a instalação MINIMA do Protheus'
 # uma vez provisionado, o ambiente sempre trabalhará com o ultimo rpo (d-1) disponibilizado, caso queira manter o teste
 echo 'criando estrutura de pastas'
 mkdir -p /protheus 
-mkdir -p /protheus/apo 
+mkdir -p /protheus_sync/apo 
 mkdir -p /protheus/bin 
 mkdir -p /protheus/bin/appserver 
 
@@ -49,19 +49,22 @@ tar -xvzf webapp.tar.gz
 rm -f *.tar.gz 
 
 ########## RPO ##########
-# Faremos um scrit para download automatico do RPO apos o provisionamento das maquinas
-# para a primeira instalação, sempre copiamos o rpo atual.
-cd /protheus/apo 
-wget https://arte.engpro.totvs.com.br/protheus/padrao/published/repositorio/lobo_guara/tttp120.rpo 
+# Caso exista o RPO no diretório, não realizo o processo de download do RPO
+cd /protheus_sync/apo 
 
+if [ -f ./tttp120.rpo ]; then
+  echo 'RPO existente, utilizaremos este RPO'
+else
+  wget https://arte.engpro.totvs.com.br/protheus/padrao/published/repositorio/lobo_guara/tttp120.rpo 
+fi
 
 echo 'Protheus|Instalação MINIMA do Protheus concluida'
 
 echo 'Protheus|Instalando serviços dentro da maquina'
 
-cp /install/manifests/usr/local/bin/init-protheus.sh /usr/local/bin/init-protheus.sh 
-cp /install/manifests/usr/local/bin/init-protheus-rest.sh /usr/local/bin/init-protheus-rest.sh 
-cp /install/manifests/usr/local/bin/init-lockserver.sh /usr/local/bin/init-lockserver.sh 
+cp /rootfs/machine/usr/local/bin/init-protheus.sh /usr/local/bin/init-protheus.sh 
+cp /rootfs/machine/usr/local/bin/init-protheus-rest.sh /usr/local/bin/init-protheus-rest.sh 
+cp /rootfs/machine/usr/local/bin/init-lockserver.sh /usr/local/bin/init-lockserver.sh 
 
 sed -i -e 's/\r$//' /usr/local/bin/*.sh 
 
@@ -69,9 +72,9 @@ chmod +x /usr/local/bin/* /usr/bin/*
 
 echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/protheus/bin/appserver:/usr/local/bin 
 
-cp /install/manifests/etc/systemd/init-protheus.service /etc/systemd/init-protheus.service 
-cp /install/manifests/etc/systemd/init-protheus-rest.service /etc/systemd/init-protheus-rest.service 
-cp /install/manifests/etc/systemd/init-lockserver.service /etc/systemd/init-lockserver.service 
+cp /rootfs/machine/etc/systemd/init-protheus.service /etc/systemd/init-protheus.service 
+cp /rootfs/machine/etc/systemd/init-protheus-rest.service /etc/systemd/init-protheus-rest.service 
+cp /rootfs/machine/etc/systemd/init-lockserver.service /etc/systemd/init-lockserver.service 
 
 sed -i -e 's/\r$//' /etc/systemd/init-protheus.service 
 sed -i -e 's/\r$//' /etc/systemd/init-protheus-rest.service 
