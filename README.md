@@ -77,16 +77,20 @@ Caso deseje copiar algum arquivo para dentro da pasta do protheus_data, basta co
 #### Dúvidas frequentes
 
 Quanto tempo demora o primeiro provisionamento?
-O processo de provisionamento poderá demorar cerca de 10 minutos, pois todos os artefatos utilizados no processo, encontram-se em hosts da internet, além disto, temos os artefatos do Protheus cujo encontram-se dentro do arte.totvs.com.br 
+
+	O processo de provisionamento poderá demorar cerca de 10 minutos, pois todos os artefatos utilizados no processo, encontram-se em hosts da internet, além disto, temos os artefatos do Protheus cujo encontram-se dentro do arte.totvs.com.br 
 	Uma vez provisionado, a subida da máquina deve demorar 2 minutos em média. 
 
 Posso copiar uma tabela do cliente para dentro da máquina virtual?
+
 	Sim, está disponível dentro da pasta de instalação uma pasta chamada pasta_sincronizada, esta pasta é um “atalho” dentro de todos os protheus_data dos ambientes.
 
 Consigo apontar um outro banco de dados para ser utilizado dentro do ambiente Linux?
+
 	Sim, basta configurar os arquivos ini do Protheus que se encontram na pasta de instalação/PROTHEUS_INI, antes de subir o ambiente.
 
 Consigo acessar o ambiente Protheus Linux instalado em minha máquina?
+
 	Sim, porém recomendo que tenha conhecimento em bash ou linha de comando para fazer esta operação. Isto se dá, pois nenhum dos ambientes possuem interface gráfica.
 	Para acessar o ambiente, acesse o CMD ou GITBASH e digite:
 
