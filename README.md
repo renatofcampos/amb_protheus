@@ -94,41 +94,43 @@ Consigo acessar o ambiente Protheus Linux instalado em minha máquina?
 	Sim, porém recomendo que tenha conhecimento em bash ou linha de comando para fazer esta operação. Isto se dá, pois nenhum dos ambientes possuem interface gráfica.
 	Para acessar o ambiente, acesse o CMD ou GITBASH e digite:
 
-Cd /ambientes/amb_protheus (o / depende do seu SO ou do bash que está utilizando)
+	Cd /ambientes/amb_protheus (o / depende do seu SO ou do bash que está utilizando)
 
-Uma vez posicionado na pasta, basta digitar:
+	Uma vez posicionado na pasta, basta digitar:
 
-```vagrant ssh protheus``` ou ```vagrant ssh protheus_rest```
+	```vagrant ssh protheus``` ou ```vagrant ssh protheus_rest```
 
-Com isto, terá acesso as maquinas do Protheus ou rest. A partir daqui, basta ter conhecimento dos comandos Linux para navegar entre os diretórios.
+	Com isto, terá acesso as maquinas do Protheus ou rest. A partir daqui, basta ter conhecimento dos comandos Linux para navegar entre os diretórios.
 
-O Protheus está instalado em: /protheus
+	O Protheus está instalado em: /protheus
 
 Qual a tecnologia está sendo utilizado para montagem dos ambientes?
+
 	Estamos utilizando a tecnologia Vagrant com Virtual Box.
 
-1. [Vagrant, o que é?](#1---vagrant-o-que-é)
-1. [Utilizando o ambiente](#2---utilizando-o-ambiente)
-1. [Referencias](#referencias)
+	1. [Vagrant, o que é?](#1---vagrant-o-que-é)
+	1. [Utilizando o ambiente](#2---utilizando-o-ambiente)
+	1. [Referencias](#referencias)
 
-## 1 - Vagrant, o que é?
->Vagrant é uma ferramenta para construir e compartilhar ambientes de desenvolvimento. Com um fluxo de trabalho simples e com foco na automação, o Vagrant reduz o tempo de configuração de seu ambiente de desenvolvimento.
+	## 1 - Vagrant, o que é?
+	>Vagrant é uma ferramenta para construir e compartilhar ambientes de desenvolvimento. Com um fluxo de trabalho simples e com foco na automação, o Vagrant reduz o tempo de configuração de seu ambiente de desenvolvimento.
 
-O Vagrant é um gerenciador de VMs (máquinas virtuais). Através dele é possível definir o ambiente de desenvolvimento onde seu projeto irá rodar. Com suporte para Mac OSX, Linux e Windows, consegue atender boa parte dos desenvolvedores. Ele utiliza providers, boxes e se necessário provisioners.
+	O Vagrant é um gerenciador de VMs (máquinas virtuais). Através dele é possível definir o ambiente de desenvolvimento onde seu projeto irá rodar. Com suporte para Mac OSX, Linux e Windows, consegue atender boa parte dos desenvolvedores. Ele utiliza providers, boxes e se necessário provisioners.
 
-#### 1.2 - Como funciona?
-Quando executamos o comando para o Vagrant subir uma VM, ele lê o arquivo ```Vagrantfile```. Nele estão todas as configurações e definições da VM em questão. O Vagrant inicia uma box no provider, definida no arquivo de configuração. Caso existam mais instruções expressas através de provisioners, ele as executa antes de deixar a máquina disponível.
+	#### 1.2 - Como funciona?
+	
+	Quando executamos o comando para o Vagrant subir uma VM, ele lê o arquivo ```Vagrantfile```. Nele estão todas as configurações e definições da VM em questão. O Vagrant inicia uma box no provider, definida no arquivo de configuração. Caso existam mais instruções expressas através de provisioners, ele as executa antes de deixar a máquina disponível.
 
-#### 1.3 - Comandos básicos:
+	#### 1.3 - Comandos básicos:
 
-Comando   | Descrição  | Uso
-----------------------------|-------------------------------------------------------| ----------------------------------------------------
-vagrant up                  | Inicializa a maquia virtual e executa o provisioner.  |Quando vamos começar a subir nosso ambiente.
-vagrant reload              | Reinicia a máquina virtual.                           |Necessário caso haja alteração no vagrantfile.
-vagrant provision           | Executa o provisioner.                                |Quando o script de provisionamento for alterado.
-vagrant halt                | Desliga a máquina virtual.                            |Quando vamos desligar a maquina virtual.
-vagrant destroy             | Destrói a máquina virtual                             |Quando vamos limpar tudo e começar de novo
-vagrant ssh                 | Acessa a máquina virtual via ssh                      |Quando queremos executar comandos manuais
+	Comando   | Descrição  | Uso
+	----------------------------|-------------------------------------------------------| ----------------------------------------------------
+	vagrant up                  | Inicializa a maquia virtual e executa o provisioner.  |Quando vamos começar a subir nosso ambiente.
+	vagrant reload              | Reinicia a máquina virtual.                           |Necessário caso haja alteração no vagrantfile.
+	vagrant provision           | Executa o provisioner.                                |Quando o script de provisionamento for alterado.
+	vagrant halt                | Desliga a máquina virtual.                            |Quando vamos desligar a maquina virtual.
+	vagrant destroy             | Destrói a máquina virtual                             |Quando vamos limpar tudo e começar de novo
+	vagrant ssh                 | Acessa a máquina virtual via ssh                      |Quando queremos executar comandos manuais
 
 # Referencias
 
