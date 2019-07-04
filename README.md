@@ -105,22 +105,28 @@ Consigo acessar o ambiente Protheus Linux instalado em minha máquina?
 	O Protheus está instalado em: /protheus
 
 Como faço para acessar o smartclient do Protheus?
+
 	Por definição, liberamos dentro deste ambiente somente o webapp. Esta tecnologia utiliza o seu browser como smartclient. Para acessá-lo, basta abrir seu browser e digitar o seguinte endereço: http://192.168.56.20:8095 e será exibido a tela para escolher o ambiente para logar no protheus.
 	Caso tenha o smartclient instalado em sua maquina, basta apontar na configuração do seu smartclient.ini para a porta 4903 e terá acesso como se fosse localmente.
 
 Como faço para abrir o dbmonitor do dbaccess?
+
 	Você deve ter instalado em sua máquina o dbmonitor.exe, com ele instalado, basta executá-lo e configurar o IP para: 192.168.0.100 (ambiente PostgreSQL) ou 192.168.0.101 (ambiente ORACLE) com a porta 7890.
 	
 Consigo realizar um debug no ambiente do Protheus?
+
 	Sim, basta configurar a porta 4903 em seu smartclient.ini ou dentro do TDS/VS-Code.
 
 Quantos ambiente são criados dentro do Protheus?
+
 	São criados para cada banco um ambiente com dicionario em banco e outro com dicionario em disco. A nomenclatura dos ambiente segue _db para dic. banco e _system para dic. no disco. Por padrão, criamos os bancos sempre com protheus na frente, desta forma, fica mais fácil de efetuar controle de backup e restore.
 
 Qual o usuario e senha dos bancos de dados?
+
 	Sempre utilizamos o nome protheus como usuario e senha. Este é o padrão para conectar nos bancos.
 
 Consigo utilizar algum gerenciador visual para o banco de dados?
+
 	Sim, para o PostgreSQL liberamos o PgAdmin 4. Basta entrar em seu browser e digitar http://192.168.56.100/pgadmin. Conforme liberarmos os demais bancos, informamos como deverá ser acessado.
 
 Qual a tecnologia está sendo utilizado para montagem dos ambientes?
@@ -150,5 +156,7 @@ Qual a tecnologia está sendo utilizado para montagem dos ambientes?
 # Referencias
 
 - http://www.vagrantup.com
+
 [página do Vagrant]:https://www.vagrantup.com/downloads.html
+
 [página do VirtualBox]:https://www.virtualbox.org/wiki/Downloads
