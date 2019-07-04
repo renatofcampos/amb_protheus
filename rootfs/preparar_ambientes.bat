@@ -40,7 +40,7 @@ git clone https://github.com/renatofcampos/amb_protheus
 
 cd c:\ambientes\amb_protheus
 
-copy C:\ambientes\amb_protheus\configs\ambiente_protheus.bat %HOMEDRIVE%%HOMEPATH%\desktop\ambiente_protheus.bat
+copy C:\ambientes\amb_protheus\rootfs\ambiente_protheus.bat %HOMEDRIVE%%HOMEPATH%\desktop\ambiente_protheus.bat
 
 echo Iniciando a instalação dos ambientes na maquina local
 vagrant plugin install vagrant-vbguest
