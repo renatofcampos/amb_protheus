@@ -2,7 +2,7 @@
 set -e
 
 echo atualizando appserver.ini
-cp /protheus_ini/dbaccess.ini /dbaccess/dbaccess.ini
+cp /install/manifests/dbaccess.ini /dbaccess/dbaccess.ini
 
 echo Executing dbaccess
 

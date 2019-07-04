@@ -21,7 +21,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # maquina postgres	  
   config.vm.define "postgres" do |postgres|
 	postgres.vm.hostname = "postgres-svc"
-    postgres.vm.network :private_network, ip: "192.168.56.100"
+    postgres.vm.network :private_network, ip: "192.168.56.100", netmask: "255.255.255.0", gw: "192.168.56.1"
+	# postgres.vm.network :forwarded_port, guest: 22, host: 2300
 	postgres.vm.network :forwarded_port, guest: 5432, host: 5432
 
 	postgres.vm.provider "virtualbox" do |v_postgres|
@@ -45,14 +46,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# antes de destruir a maquina, tirar um backup do banco
 	postgres.trigger.before :destroy do |trigger|
       trigger.warn = "Dumping database to /logs"
-      trigger.run_remote = {inline: "pg_dump protheus_db > /logs/protheus_db.dump"}
-      trigger.run_remote = {inline: "pg_dump protheus_system > /logs/protheus_system.dump"}
+      #trigger.run_remote = {inline: "pg_dump protheus_db > /logs/protheus_db.dump"}
+      #trigger.run_remote = {inline: "pg_dump protheus_system > /logs/protheus_system.dump"}
     end
   end
  
   config.vm.define "oracle" do |oracle|
 	oracle.vm.hostname = "dbaccess-svc"
-    oracle.vm.network :private_network, ip: "192.168.56.101"
+    oracle.vm.network :private_network, ip: "192.168.56.101", netmask: "255.255.255.0", gw: "192.168.56.1"
 	oracle.vm.network "forwarded_port", guest: 22, host: 2300
 
 	oracle.vm.provider "virtualbox" do |v_oracle|
@@ -80,7 +81,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       v_lockserver.name = "protheus-lockserver-svc"
     end
 
-    lockserver.vm.network :private_network, ip: "192.168.56.10"
+    lockserver.vm.network :private_network, ip: "192.168.56.10", netmask: "255.255.255.0", gw: "192.168.56.1"
 	lockserver.vm.network "forwarded_port", guest: 22, host: 2210
 	lockserver.vm.hostname = "protheus-lockserver-svc"
 	lockserver.vm.synced_folder "./protheus_ini", "/protheus_ini"
@@ -103,7 +104,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	end
 
 	protheus.vm.hostname = "protheus-svc"
-	protheus.vm.network "private_network", ip: "192.168.56.20"
+	protheus.vm.network "private_network", ip: "192.168.56.20", netmask: "255.255.255.0", gw: "192.168.56.1"
 	
 	protheus.vm.provision "shell", path: "./install/scripts/protheus_install.sh"
 
@@ -111,6 +112,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	protheus.vm.synced_folder "./protheus_ini", "/protheus_ini"
 
 	protheus.trigger.after :up do |t_protheus|
+	  # t_protheus.run_remote = {inline: "sudo /usr/local/bin/atualiza_rpo.sh"}
       t_protheus.warn = "Iniciando protheus"
       t_protheus.run_remote = {inline: "sudo systemctl start init-protheus.service"}
     end
@@ -127,14 +129,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	end
 
 	protheus_rest.vm.hostname = "protheus_rest-svc"
-	protheus_rest.vm.network "private_network", ip: "192.168.56.30"
+	protheus_rest.vm.network "private_network", ip: "192.168.56.30", netmask: "255.255.255.0", gw: "192.168.56.1"
 	protheus_rest.vm.provision "shell", path: "./install/scripts/protheus_minimal_install.sh"
 
 	protheus_rest.vm.synced_folder "./pasta_sincronizada", "/protheus/protheus_data/pasta_sincronizada"
 	protheus_rest.vm.synced_folder "./protheus_ini", "/protheus_ini"
 
 	protheus_rest.trigger.after :up do |t_protheus_rest|
-      t_protheus_rest.warn = "Iniciando protheus"
+      # t_protheus_rest.run_remote = {inline: "sudo /usr/local/bin/atualiza_rpo.sh"}
+	  t_protheus_rest.warn = "Iniciando protheus"
       t_protheus_rest.run_remote = {inline: "sudo systemctl start init-protheus-rest.service"}
     end
   end

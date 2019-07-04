@@ -35,12 +35,15 @@ print_db_usage () {
 echo 'Iniciando a instalação do PostgreSQL'
 
 yum update -y 
-yum install -y wget
-yum install -y unzip
-yum install -y tar
+yum install -y wget 
+yum install -y unzip 
+yum install -y tar 
 yum install -y telnet 
 yum install -y vim 
-yum install -y epel-release
+yum install -y net-tools
+yum install -y epel-release  
+# yum install -y binutils.x86_64 compat-libcap1.x86_64 gcc.x86_64 gcc-c++.x86_64 glibc.i686 glibc.x86_64 glibc-devel.i686 glibc-devel.x86_64 ksh compat-libstdc++-33 libaio.i686 libaio.x86_64 libaio-devel.i686 libaio-devel.x86_64 libgcc.i686 libgcc.x86_64 libstdc++.i686 libstdc++.x86_64 libstdc++-devel.i686 libstdc++-devel.x86_64 libXi.i686 libXi.x86_64 libXtst.i686 libXtst.x86_64 make.x86_64 sysstat.x86_64 which 
+yum install -y puppet-server 
 
 yum clean all
 
@@ -110,9 +113,13 @@ PG_HBA="/var/lib/pgsql/$PG_VERSION/data/pg_hba.conf"
 # Edit postgresql.conf to change listen address to '*':
 sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" "$PG_CONF"
 
+# comenta todos endereços para nova configuração
+sed -i "s/local   all/#local   all/" "$PG_HBA"
+sed -i "s/host    all/#host    all/" "$PG_HBA"
+
 # Append to pg_hba.conf to add password auth:
+echo "local   all             all                                     trust" >> "$PG_HBA"
 echo "host    all             all             all                     trust" >> "$PG_HBA"
-sed -i "s/local   all             all                                     peer/local   all             all                                     trust/" "$PG_HBA"
 
 systemctl restart postgresql-10 
 
@@ -128,6 +135,30 @@ odbcinst -i -s -f /install/manifests/etc/odbc.ini
 systemctl start postgresql-10
 
 echo 'Instalação do PostgreSQL concluida'
+echo 'Iniciando Instalação do PostgresADMIN'
+
+yum install -y pgadmin4
+
+cp /etc/httpd/conf.d/pgadmin4.conf.sample /etc/httpd/conf.d/pgadmin4.conf
+
+mkdir /var/log/pgadmin4/
+mkdir /var/lib/pgadmin4/
+
+PGA_CONF="/usr/lib/python2.7/site-packages/pgadmin4-web/config_local.py"
+
+echo "LOG_FILE = '/var/log/pgadmin4/pgadmin4.log'" >> "$PGA_CONF"
+echo "SQLITE_PATH = '/var/lib/pgadmin4/pgadmin4.db'" >> "$PGA_CONF"
+echo "SESSION_DB_PATH = '/var/lib/pgadmin4/sessions'" >> "$PGA_CONF"
+echo "STORAGE_DIR = '/var/lib/pgadmin4/storage'" >> "$PGA_CONF"
+
+systemctl start httpd
+systemctl enable httpd
+
+python /usr/lib/python2.7/site-packages/pgadmin4-web/setup.py
+
+systemctl restart httpd
+
+echo 'Instalação do PostgresADMIN Concluida'
 echo ""
 
 print_db_usage

@@ -16,8 +16,8 @@ echo        MENU INICIANDO AMBIENTES
 echo  ============================================
 echo  * 1. Ambiente Protheus + SQL Server        * 
 echo  * 2. Ambiente Protheus + PostgreSQL        * 
-echo  * 3. Ambiente Protheus + Oracle            *
-echo  * 4. Ambiente Protheus + DB2               *
+#echo  * 3. Ambiente Protheus + Oracle            *
+#echo  * 4. Ambiente Protheus + DB2               *
 echo  * 5. Apagar todos os ambientes             *
 echo  * 6. Sair                                  * 
 echo  ============================================
@@ -26,8 +26,8 @@ set /p opcao= Escolha uma opcao:
 echo ------------------------------
 if %opcao% equ 1 goto opcao1
 if %opcao% equ 2 goto opcao2
-if %opcao% equ 3 goto opcao3
-if %opcao% equ 4 goto opcao4
+#if %opcao% equ 3 goto opcao3
+#if %opcao% equ 4 goto opcao4
 if %opcao% equ 5 goto opcao5
 if %opcao% equ 6 goto opcao6
 if %opcao% GEQ 7 goto opcao7
@@ -55,7 +55,7 @@ echo =====================================
 echo *   Ambiente Protheus + PostgreSQL  *
 echo =====================================
 cd c:\ambientes\amb_protheus\
-vagrant up lockserver protheus postgresql
+vagrant up postgres lockserver protheus 
 cls
 echo ===========================================
 echo *   Ambiente iniciado no IP 192.168.56.20 *
