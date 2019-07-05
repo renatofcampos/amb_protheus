@@ -1,6 +1,7 @@
 #!/bin/sh
 
 PG_VERSION=10
+DB_USERMAIL=protheus@protheus.com
 DB_USER=protheus
 DB_PASS=protheus
 DB_NAME_SF=protheus_system
@@ -14,6 +15,7 @@ print_db_usage () {
   echo "  Database 1: $DB_NAME_SF"
   echo "  Database 2: $DB_NAME_DB"
   echo "  Username: $DB_USER"
+  echo "  UserMail: $DB_USERMAIL"
   echo "  Password: $DB_PASS"
   echo ""
   echo "Admin possui acesso ao postgres via a VM:"
@@ -96,14 +98,6 @@ CREATE DATABASE $DB_NAME_DB WITH OWNER=$DB_USER
 
 EOF
 
-#echo "Alterando senhas para utilização no dbaccess"
-#cat << EOF | su - postgres -c psql $DB_NAME_DB 
-#alter user $DB_USER with encrypted password '$DB_PASS';
-#EOF
-#
-#cat << EOF | su - postgres -c psql $DB_NAME_FS 
-#alter user $DB_USER with encrypted password '$DB_PASS';
-#EOF
 
 echo "Configurando o postgres para utilização do dbaccess"
 
@@ -139,22 +133,58 @@ echo 'Iniciando Instalação do PostgresADMIN'
 
 yum install -y pgadmin4
 
-cp /etc/httpd/conf.d/pgadmin4.conf.sample /etc/httpd/conf.d/pgadmin4.conf
+systemctl start httpd && systemctl enable httpd
 
-mkdir /var/log/pgadmin4/
-mkdir /var/lib/pgadmin4/
+echo "ServerName 192.168.56.100:80" >> "/etc/httpd/conf/httpd.conf"
+echo "IncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf/httpd.conf"
 
-PGA_CONF="/usr/lib/python2.7/site-packages/pgadmin4-web/config_local.py"
+PGADMINCONF="/etc/httpd/conf.d/pgadmin4.conf"
 
-echo "LOG_FILE = '/var/log/pgadmin4/pgadmin4.log'" >> "$PGA_CONF"
-echo "SQLITE_PATH = '/var/lib/pgadmin4/pgadmin4.db'" >> "$PGA_CONF"
-echo "SESSION_DB_PATH = '/var/lib/pgadmin4/sessions'" >> "$PGA_CONF"
-echo "STORAGE_DIR = '/var/lib/pgadmin4/storage'" >> "$PGA_CONF"
+# configurando o PgAdmin4
+echo "ServerName 192.168.0.100:80" >> "$PGADMINCONF"
+echo "LoadModule wsgi_module modules/mod_wsgi.so" >> "$PGADMINCONF"
+echo "WSGIDaemonProcess pgadmin processes=1 threads=25" >> "$PGADMINCONF"
+echo "WSGIScriptAlias /pgadmin4 /usr/lib/python2.7/site-packages/pgadmin4-web/pgAdmin4.wsgi" >> "$PGADMINCONF"
+echo "" >> "$PGADMINCONF"
+echo "<Directory /usr/lib/python2.7/site-packages/pgadmin4-web/>" >> "$PGADMINCONF"
+echo "        WSGIProcessGroup pgadmin" >> "$PGADMINCONF"
+echo "        WSGIApplicationGroup %{GLOBAL}" >> "$PGADMINCONF"
+echo "        <IfModule mod_authz_core.c>" >> "$PGADMINCONF"
+echo "                # Apache 2.4" >> "$PGADMINCONF"
+echo "                Require all granted" >> "$PGADMINCONF"
+echo "        </IfModule>" >> "$PGADMINCONF"
+echo "        <IfModule !mod_authz_core.c>" >> "$PGADMINCONF"
+echo "                # Apache 2.2" >> "$PGADMINCONF"
+echo "                Order Deny,Allow" >> "$PGADMINCONF"
+echo "                Allow from All" >> "$PGADMINCONF"
+echo "                Allow from 127.0.0.1" >> "$PGADMINCONF"
+echo "                Allow from ::1" >> "$PGADMINCONF"
+echo "        </IfModule>" >> "$PGADMINCONF"
+echo "</Directory>" >> "$PGADMINCONF"
+echo "" >> "$PGADMINCONF"
 
-systemctl start httpd
-systemctl enable httpd
 
-python /usr/lib/python2.7/site-packages/pgadmin4-web/setup.py
+mkdir -p /var/www/pgadmin4
+mkdir -p /var/www/pgadmin4/public_html
+
+PGA_CONF="/usr/lib/python2.7/site-packages/pgadmin4-web/config_distro.py"
+
+echo "LOG_FILE = '/var/www/pgadmin4/pgadmin4.log'" >> "$PGA_CONF"
+echo "SQLITE_PATH = '/var/www/pgadmin4/pgadmin4.db'" >> "$PGA_CONF"
+echo "SESSION_DB_PATH = '/var/www/pgadmin4/sessions'" >> "$PGA_CONF"
+echo "STORAGE_DIR = '/var/www/pgadmin4/storage'" >> "$PGA_CONF"
+
+
+cat << EOF | python /usr/lib/python2.7/site-packages/pgadmin4-web/setup.py
+	echo $DB_USERMAIL
+	echo $DB_PASS
+	echo $DB_PASS
+EOF
+
+setenforce 0
+
+chown -R apache:apache /var/www/pgadmin4/
+chmod -R 775 /var/www/pgadmin4/
 
 systemctl restart httpd
 
