@@ -29,11 +29,7 @@ As máquinas seguem o padrão “C” de rede, iniciando com 192.168.56.xxx onde
 #### Se estiver usando uma máquina ```BASE UNIX```, realizar a instalação dos RPMs conforme a sua distribuição.
 *Referencias estão citadas no rodapé do mesmo. *
 
-<<<<<<< HEAD
-Com os três softwares instalados em sua máquina, realize o download do arquivo: https://github.com/renatofcampos/amb_protheus/blob/master/install/ambiente_protheus.bat e copie na sua área de trabalho
-=======
-Com os três softwares instalados em sua máquina, realize o download do arquivo: https://github.com/renatofcampos/amb_protheus/blob/master/rootfs/preparar_ambientes.bat e copie na sua área de trabalho. (botão direito do mouse e clique em salvar link como)
->>>>>>> 300f159e375026ee320e654744fd40b1600bed79
+Com os três softwares instalados em sua máquina, realize o download do arquivo: https://github.com/renatofcampos/amb_protheus/blob/master/install/ambiente_protheus.bat e copie na sua área de trabalho. (botão direito do mouse e clique em salvar link como)
 
 Após o download, realize os seguintes passos:
 
@@ -44,7 +40,7 @@ Após o download, realize os seguintes passos:
 Caso não tenha, volte e instale, pois sem eles não é possível a instalação dos ambientes.
 
 3. Após concluído o processo de instalação, será disponibilizado em sua área de trabalho um novo ícone com o nome: ambiente_protheus.bat. 
-*Caso não seja criado, entre na pasta: C:\ambientes\amb_protheus\configs\ e copie o arquivo ambiente_protheus.bat para a área de trabalho.*
+*Caso não seja criado, entre na pasta: C:\ambientes\amb_protheus\rootfs\ e copie o arquivo ambiente_protheus.bat para a área de trabalho.*
 	Este é o executável que irá subir os ambientes em sua máquina (HOST).
 
 4. Ao executar o atalho, será exibido uma nova tela indicando qual o ambiente que deseja executar, basta escolher o ambiente e iniciar os testes do mesmo.
@@ -72,7 +68,7 @@ Caso deseje fazer alguma alteração nos INIs padrão do Protheus, entre na past
 
 *Dica: Caso deseja utilizar um ambiente Protheus Linux com o SQLServer, basta configurar o ini do Protheus para enxergar a sua maquina onde o DbAccess Windows está instalado* 
 
-Para atualização de um RPO, basta parar o ambiente e copiar o RPO desejado dentro da pasta APO que fica dentro da pasta de instalação dos ambientes. (Será liberado na versão 2.0 do projeto)
+Para atualização de um RPO, basta parar o ambiente e copiar o RPO desejado dentro da pasta APO que fica dentro da pasta de instalação dos ambientes. (se estiver usando windows, ficará em c:\ambientes\amb_protheus\protheus\apo)
 
 ```NÃO ALTERAR AS DEMAIS PASTAS DE INSTALAÇÃO, POIS PODERA PARAR TODO O AMBIENTE VIRTUAL```
 
@@ -91,7 +87,7 @@ Posso copiar uma tabela do cliente para dentro da máquina virtual?
 
 Consigo apontar um outro banco de dados para ser utilizado dentro do ambiente Linux?
 
-	Sim, basta configurar os arquivos ini do Protheus que se encontram na pasta de instalação/PROTHEUS_INI, antes de subir o ambiente.
+	Sim, basta configurar os arquivos ini do Protheus que se encontram na pasta ./protheus/appserver que fica dentro da pasta de instalação dos ambiente, *** antes de subir o ambiente.
 
 Consigo acessar o ambiente Protheus Linux instalado em minha máquina?
 
@@ -108,8 +104,6 @@ Consigo acessar o ambiente Protheus Linux instalado em minha máquina?
 
 	O Protheus está instalado em: /protheus
 
-<<<<<<< HEAD
-=======
 Como faço para acessar o smartclient do Protheus?
 
 	Por definição, liberamos dentro deste ambiente somente o webapp. Esta tecnologia utiliza o seu browser como smartclient. Para acessá-lo, basta abrir seu browser e digitar o seguinte endereço: http://192.168.56.20:8095 e será exibido a tela para escolher o ambiente para logar no protheus.
@@ -133,27 +127,23 @@ Qual o usuario e senha dos bancos de dados?
 
 Consigo utilizar algum gerenciador visual para o banco de dados?
 
-	Sim, para o PostgreSQL liberamos o PgAdmin 4. Basta entrar em seu browser e digitar http://192.168.56.100/pgadmin. Conforme liberarmos os demais bancos, informamos como deverá ser acessado.
+	Sim, para o PostgreSQL liberamos o PgAdmin 4. Basta entrar em seu browser e digitar http://192.168.56.100/pgadmin4. usuario será protheus@protheus.com e a senha protheus.
+	Conforme liberarmos os demais bancos, informamos como deverá ser acessado.
 
->>>>>>> 300f159e375026ee320e654744fd40b1600bed79
 Qual a tecnologia está sendo utilizado para montagem dos ambientes?
 
 	Estamos utilizando a tecnologia Vagrant com Virtual Box.
 
-	1. [Vagrant, o que é?](#1---vagrant-o-que-é)
-	1. [Utilizando o ambiente](#2---utilizando-o-ambiente)
-	1. [Referencias](#referencias)
-
-	## 1 - Vagrant, o que é?
+	1 - Vagrant, o que é?
 	>Vagrant é uma ferramenta para construir e compartilhar ambientes de desenvolvimento. Com um fluxo de trabalho simples e com foco na automação, o Vagrant reduz o tempo de configuração de seu ambiente de desenvolvimento.
 
 	O Vagrant é um gerenciador de VMs (máquinas virtuais). Através dele é possível definir o ambiente de desenvolvimento onde seu projeto irá rodar. Com suporte para Mac OSX, Linux e Windows, consegue atender boa parte dos desenvolvedores. Ele utiliza providers, boxes e se necessário provisioners.
 
-	#### 1.2 - Como funciona?
+	1.2 - Como funciona?
 	
 	Quando executamos o comando para o Vagrant subir uma VM, ele lê o arquivo ```Vagrantfile```. Nele estão todas as configurações e definições da VM em questão. O Vagrant inicia uma box no provider, definida no arquivo de configuração. Caso existam mais instruções expressas através de provisioners, ele as executa antes de deixar a máquina disponível.
 
-	#### 1.3 - Comandos básicos:
+	1.3 - Comandos básicos:
 
 	Comando   | Descrição  | Uso
 	----------------------------|-------------------------------------------------------| ----------------------------------------------------
@@ -167,7 +157,5 @@ Qual a tecnologia está sendo utilizado para montagem dos ambientes?
 # Referencias
 
 - http://www.vagrantup.com
-
 [página do Vagrant]:https://www.vagrantup.com/downloads.html
-
 [página do VirtualBox]:https://www.virtualbox.org/wiki/Downloads
