@@ -21,7 +21,9 @@ echo  - Git - https://github.com/git-for-windows/git/releases/download/v2.22.0.w
 set /p opcao=Deseja continuar o processo de configuração dos ambientes? (S para SIM e N para NÃO):
 echo ------------------------------
 if %opcao% equ S goto opcao1
+if %opcao% equ s goto opcao1
 if %opcao% GEQ N goto opcao2
+if %opcao% GEQ n goto opcao2
 
 cls
 

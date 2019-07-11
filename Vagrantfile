@@ -33,6 +33,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	postgres.trigger.after :up do |trigger|
       trigger.warn = "Iniciando Banco de dados"
       trigger.run_remote = {inline: "sudo systemctl start init-dbaccess.service"}
+      trigger.run_remote = {inline: "sudo setenforce 0"}
+	  trigger.run_remote = {inline: "ping 192.168.56.20 -c 10"}
     end
 	
 	# antes de destruir a maquina, tirar um backup do banco

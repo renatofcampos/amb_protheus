@@ -14,7 +14,7 @@ echo    renato.campos@totvs.com.br
 echo  ============================================
 echo        MENU INICIANDO AMBIENTES
 echo  ============================================
-echo  * 1. Ambiente Protheus + SQL Server        * 
+echo  * 1. Ambiente Protheus + Sem banco de dados* 
 echo  * 2. Ambiente Protheus + PostgreSQL        * 
 #echo  * 3. Ambiente Protheus + Oracle            *
 #echo  * 4. Ambiente Protheus + DB2               *
@@ -36,9 +36,9 @@ cls
 
 :opcao1
 cls
-echo =====================================
-echo *   Ambiente Protheus + SQL Server  *
-echo =====================================
+echo ===========================================
+echo *   Ambiente Protheus Sem Banco de dados  *
+echo ===========================================
 cd c:\ambientes\amb_protheus\
 vagrant up lockserver protheus
 cls
@@ -51,11 +51,11 @@ goto menu_stop
 
 :opcao2
 cls
-echo =====================================
-echo *   Ambiente Protheus + PostgreSQL  *
-echo =====================================
+echo ===========================================
+echo *   Ambiente Protheus + PostgreSQL        *
+echo ===========================================
 cd c:\ambientes\amb_protheus\
-vagrant up postgres lockserver protheus 
+vagrant up lockserver protheus postgres
 cls
 echo ===========================================
 echo *   Ambiente iniciado no IP 192.168.56.20 *
