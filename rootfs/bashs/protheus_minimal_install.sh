@@ -30,7 +30,6 @@ echo 'Protheus|Iniciando a instalação MINIMA do Protheus'
 # uma vez provisionado, o ambiente sempre trabalhará com o ultimo rpo (d-1) disponibilizado, caso queira manter o teste
 echo 'criando estrutura de pastas'
 mkdir -p /protheus 
-mkdir -p /protheus_sync/apo 
 mkdir -p /protheus/bin 
 mkdir -p /protheus/bin/appserver 
 
@@ -47,16 +46,6 @@ chmod 777 *.so
 wget https://arte.engpro.totvs.com.br/tec/smartclientwebapp/lobo_guara/linux/64/published/webapp.tar.gz 
 tar -xvzf webapp.tar.gz 
 rm -f *.tar.gz 
-
-########## RPO ##########
-# Caso exista o RPO no diretório, não realizo o processo de download do RPO
-cd /protheus_sync/apo 
-
-if [ -f ./tttp120.rpo ]; then
-  echo 'RPO existente, utilizaremos este RPO'
-else
-  wget https://arte.engpro.totvs.com.br/protheus/padrao/published/repositorio/lobo_guara/tttp120.rpo 
-fi
 
 echo 'Protheus|Instalação MINIMA do Protheus concluida'
 

@@ -50,12 +50,8 @@ mkdir -p /protheus/protheus_data/system
 mkdir -p /protheus/protheus_data/system/modelo 	
 mkdir -p /protheus/protheus_data/system/mssqlserver_db 	
 mkdir -p /protheus/protheus_data/system/mssqlserver_system	
-mkdir -p /protheus/protheus_data/system/oracle_db 	
-mkdir -p /protheus/protheus_data/system/oracle_system	
 mkdir -p /protheus/protheus_data/system/postgresql_db 	
 mkdir -p /protheus/protheus_data/system/postgresql_system	
-mkdir -p /protheus/protheus_data/system/db2_db 	
-mkdir -p /protheus/protheus_data/system/db2_system	
 
 ########## ARTEFATOS DO BINARIO ##########
 # para realizar o download dos artefatos, utilizamos os nomes comuns disponibilizados pela engenharia, desta forma, a tendencia de manutenção no mesmo fica reduzida.
@@ -82,36 +78,32 @@ fi
 
 ########## ARTEFATOS DO SYSTEM ##########
 cd /protheus/protheus_data/system/modelo 
-wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/arquivos_de_configuracao/19-02-14-ARQUIVOS_CONFIGURACAO_FISCAL_12_1_23.ZIP 
-wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/arquivos_de_configuracao/19-02-15-ARQUIVOS_PORTAL_E_WIZARD_SIGAPLS_12.1.23.ZIP 
-wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/stored_procedures/19-02-15-STORED_PROCEDURES_TODAS_V12.1.23.ZIP 
-wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/menus/completo/19-02-15-BRA-MENUS_12_1_23.ZIP  
-unzip -o 19-02-14-ARQUIVOS_CONFIGURACAO_FISCAL_12_1_23.ZIP 
-unzip -o 19-02-15-ARQUIVOS_PORTAL_E_WIZARD_SIGAPLS_12.1.23.ZIP 
-unzip -o 19-02-15-STORED_PROCEDURES_TODAS_V12.1.23.ZIP 
-unzip -o 19-02-15-BRA-MENUS_12_1_23.ZIP 
+wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/arquivos_de_configuracao/ARQUIVOS_CONFIGURACAO_FISCAL.ZIP 
+wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/arquivos_de_configuracao/ARQUIVOS_PORTAL_E_WIZARD_SIGAPLS.ZIP 
+wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/stored_procedures/STORED_PROCEDURES_TODAS.ZIP 
+wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/menus/completo/BRA-MENUS.ZIP  
+unzip -o ARQUIVOS_CONFIGURACAO_FISCAL.ZIP 
+unzip -o ARQUIVOS_PORTAL_E_WIZARD_SIGAPLS.ZIP 
+unzip -o STORED_PROCEDURES_TODAS.ZIP 
+unzip -o BRA-MENUS.ZIP 
 unzip -o 'arquivos CSV.zip' 
 unzip -o 'arquivos JS.zip' 
-rm -f *12_1_23.ZIP 
+rm -f *.ZIP 
 
 cp -f -r * ../mssqlserver_db 
-cp -f -r * ../oracle_db 
 cp -f -r * ../postgresql_db 
-cp -f -r * ../db2_db 
 cp -f -r * ../mssqlserver_system
-cp -f -r * ../oracle_system
 cp -f -r * ../postgresql_system
-cp -f -r * ../db2_system
 
 ########## ARTEFATOS DO SYSTEMLOAD ##########
 cd /protheus/protheus_data/systemload 
-wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/dicionario_de_dados/completo/19-02-15-BRA-DICIONARIOS_COMPL_12_1_23.ZIP	 
-wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/dicionario_de_dados/diferencial/19-02-15-BRA-DICIONARIOS_DIF_12_1_23.ZIP 
-wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/help_de_campo/completo/19-02-14-BRA-HELPS_COMPL_12_1_23.ZIP 
-unzip -o 19-02-15-BRA-DICIONARIOS_COMPL_12_1_23.ZIP 
-unzip -o 19-02-15-BRA-DICIONARIOS_DIF_12_1_23.ZIP 
-unzip -o 19-02-14-BRA-HELPS_COMPL_12_1_23.ZIP 
-rm -f *12_1_23.ZIP 
+wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/dicionario_de_dados/completo/BRA-DICIONARIOS_COMPL.ZIP	 
+wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/dicionario_de_dados/diferencial/BRA-DICIONARIOS_DIF.ZIP 
+wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/help_de_campo/completo/BRA-HELPS_COMPL.ZIP 
+unzip -o BRA-DICIONARIOS_COMPL.ZIP 
+unzip -o BRA-DICIONARIOS_DIF.ZIP 
+unzip -o BRA-HELPS_COMPL.ZIP 
+rm -f *.ZIP 
 cd /protheus/protheus_data/systemload/bra 
 cp * .. 
 cd .. 
@@ -119,14 +111,12 @@ rm bra/* -f
 rmdir bra 
 
 cd /protheus/protheus_data/systemload/updmenu 
-wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/menus/completo/19-02-15-BRA-MENUS_12_1_23.ZIP  
-unzip -o 19-02-15-BRA-MENUS_12_1_23.ZIP 
-rm -f *12_1_23.ZIP 
+cp -f /protheus/protheus_data/system/modelo/*.xnu .
 
 cd /protheus/protheus_data/web 
-wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/web-files/19-02-15-WEB-FILES-P12.1.23.ZIP 
-unzip -o 19-02-15-WEB-FILES-P12.1.23.ZIP 
-rm -f *12.1.23.ZIP
+wget https://arte.engpro.totvs.com.br/protheus/padrao/published/dicionario/web-files/WEB-FILES.ZIP 
+unzip -o WEB-FILES.ZIP 
+rm -f *.ZIP
 
 echo 'Protheus|Instalação do Protheus concluida'
 

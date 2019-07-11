@@ -1,4 +1,4 @@
-#Este projeto tem a finalidade de efetuar a criação automática de ambientes Linux com Protheus. Até este momento temos disponível a instalação do LOCKSERVER, PROTHEUS (12.1.23) e POSTGRES.
+#Este projeto tem a finalidade de efetuar a criação automática de ambientes Linux com Protheus. Até este momento temos disponível a instalação do LOCKSERVER, PROTHEUS (12.1.25) e POSTGRES.
 
 **Sinta-se encorajado a questionar e contribuir com esse material**
 
@@ -56,7 +56,7 @@ Caso não tenha, volte e instale, pois sem eles não é possível a instalação
 
 Os ambientes montados utilizam os últimos artefatos disponibilizados pela engenharia Protheus e/ou homologados pela TOTVS.
 
-O Protheus instalado é o LOBO GUARÁ, versão 12.1.23 com o RPO D-1 disponibilizado no momento do provisionamento do ambiente. Todos os artefatos são encontrados no arte.totvs.com.br
+O Protheus instalado é o LOBO GUARÁ, versão 12.1.25 com o RPO D-1 disponibilizado no momento do provisionamento do ambiente. Todos os artefatos são encontrados no arte.totvs.com.br
 
 O Dbaccess é o 64bits, último homologado, também segue a regra do Protheus, cujo a data é a ultima disponibilizada no momento do provisionamento.
 *Ainda não está desenvolvido o auto update e/ou o update via linha de comando dos artefatos do binário, estou trabalhando nisto. *

@@ -136,7 +136,7 @@ yum install -y pgadmin4
 systemctl start httpd && systemctl enable httpd
 
 echo "ServerName 192.168.56.100:80" >> "/etc/httpd/conf/httpd.conf"
-echo "IncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf/httpd.conf"
+echo "#IncludeOptional sites-enabled/*.conf" >> "/etc/httpd/conf/httpd.conf"
 
 PGADMINCONF="/etc/httpd/conf.d/pgadmin4.conf"
 
@@ -163,7 +163,6 @@ echo "        </IfModule>" >> "$PGADMINCONF"
 echo "</Directory>" >> "$PGADMINCONF"
 echo "" >> "$PGADMINCONF"
 
-
 mkdir -p /var/www/pgadmin4
 mkdir -p /var/www/pgadmin4/public_html
 
@@ -181,10 +180,16 @@ cat << EOF | python /usr/lib/python2.7/site-packages/pgadmin4-web/setup.py
 	echo $DB_PASS
 EOF
 
-setenforce 0
-
 chown -R apache:apache /var/www/pgadmin4/
 chmod -R 775 /var/www/pgadmin4/
+
+setenforce 0
+SETEN_FILE="/etc/sysconfig/selinux"
+
+# Força o desligamento do SELINUX
+sed -i "s/SELINUX=/#SELINUX=/" "$SETEN_FILE"
+echo "SELINUX=disabled" >> "$SETEN_FILE"
+
 
 systemctl restart httpd
 
