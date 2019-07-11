@@ -29,7 +29,7 @@ As máquinas seguem o padrão “C” de rede, iniciando com 192.168.56.xxx onde
 #### Se estiver usando uma máquina ```BASE UNIX```, realizar a instalação dos RPMs conforme a sua distribuição.
 *Referencias estão citadas no rodapé do mesmo. *
 
-Com os três softwares instalados em sua máquina, realize o download do arquivo: https://github.com/renatofcampos/amb_protheus/blob/master/install/ambiente_protheus.bat e copie na sua área de trabalho. (botão direito do mouse e clique em salvar link como)
+Com os três softwares instalados em sua máquina, realize o download do arquivo: https://github.com/renatofcampos/amb_protheus/blob/master/rootfs/preparar_ambientes.bat e copie na sua área de trabalho. (botão direito do mouse e clique em salvar link como)
 
 Após o download, realize os seguintes passos:
 
